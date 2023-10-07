@@ -36,4 +36,6 @@ public:
     void calcOutputGradients(float targetVal);
     void calcHiddenGradients(const Layer &nextLayer);
     void updateInputWeights(Layer &prevLayer);
+
+    static void setLearningRate(float learningRate);
 };

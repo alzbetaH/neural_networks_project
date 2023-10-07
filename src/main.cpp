@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cmath>
+#include <getopt.h>
 
 #include "main.hpp"
 
@@ -37,21 +38,66 @@ void showVectorVals(string label, vector<float> &v)
     cout << endl;
 }
 
+void usage(){
+    cerr << "Usage: ./network -e [NUM_EPOCHS] -l [LEARNING_RATE] -b [BATCH_SIZE] INPUT_NEURONS_AMOUNT HIDDEN_LAYER_1_NEURONS_AMOUNT [...] OUTPUT_NEURONS_AMOUNT" << endl;
+}
+
 int main(int argc, char *argv[]){
-    if (argc < 3)
-    {
-        cerr << "Usage: ./network INPUT_NEURONS_AMOUNT HIDDEN_LAYER_1_NEURONS_AMOUNT [...] OUTPUT_NEURONS_AMOUNT" << endl;
-        exit(1);
+    unsigned epochs = 1;
+    bool epochsSet = false;
+    unsigned batchSize = 1;
+    bool batchSizeSet = false;
+    float learningRate = 0.01;
+    bool learningRateSet = false;
+
+    struct option long_options[] = {
+        {"epochs", required_argument, nullptr, 'e'},
+        {"learning_rate", required_argument, nullptr, 'l'},
+        {"batch_size", required_argument, nullptr, 'b'},
+        {nullptr, 0, nullptr, 0}
+    };
+
+    int option_index = 0;
+    int c;
+    while ((c = getopt_long(argc, argv, "e:l:b:", long_options, &option_index)) != -1) {
+        cout << option_index << endl;
+        switch (c) {
+            case 'e':
+                epochs = std::atoi(optarg);
+                epochsSet = true;
+                break;
+            case 'l':
+                learningRate = std::atof(optarg);
+                learningRateSet = true;
+                break;
+            case 'b':
+                batchSize = std::atoi(optarg);
+                batchSizeSet = true;
+                break;
+            case '?':
+                std::cerr << "Unknown option or missing argument value" << std::endl;
+                usage();
+                return 1;
+            default:
+                std::cerr << "Unhandled option" << std::endl;
+                usage();
+                return 1;
+        }
     }
 
-    // We can still fit arguments for the learning rate, batch size and such,
-    // here, I guess
+    if(!epochsSet || !learningRateSet || !batchSizeSet){
+        usage();
+        return 1;
+    }
 
-    unsigned epochs = 2000; // TODO Make it an argument
-    // TODO Learning rate
-    // TODO Batch size?
+    if (argc - optind < 3)
+    {
+        usage();
+        return 1;
+    }
+    vector<unsigned> topology = parseTopology(argc - optind, &(argv[optind]));
 
-    vector<unsigned> topology = parseTopology(argc - 1, &(argv[1]));
+    Neuron::setLearningRate(learningRate);
 
     Net myNet(topology);
 

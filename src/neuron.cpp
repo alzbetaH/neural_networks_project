@@ -3,6 +3,16 @@
 float Neuron::eta = 0.15;
 float Neuron::alpha = 0.5;
 
+Neuron::Neuron(unsigned numOutputs, unsigned myIndex)
+{
+    for (unsigned c = 0; c < numOutputs; ++c)
+    {
+        m_outWeights.push_back(Connection());
+        m_outWeights.back().weight = randomWeight();
+    }
+    m_myIndex = myIndex;
+}
+
 void Neuron::updateInputWeights(Layer &prevLayer)
 {
     //including bias
@@ -71,14 +81,7 @@ void Neuron::feedForward(const Layer &prevLayer)
     m_outVal = Neuron::transferFunction(sum);
 }
 
-
-Neuron::Neuron(unsigned numOutputs, unsigned myIndex)
+void Neuron::setLearningRate(float learningRate)
 {
-    for (unsigned c = 0; c < numOutputs; ++c)
-    {
-        m_outWeights.push_back(Connection());
-        m_outWeights.back().weight = randomWeight();
-    }
-    m_myIndex = myIndex;
-    
+    eta = learningRate;
 }

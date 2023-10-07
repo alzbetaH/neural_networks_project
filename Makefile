@@ -12,8 +12,16 @@ network: $(SOURCES)
 	g++ -std=c++17 -Wall -O3 -Ofast $(SOURCES) -o network -g
 
 
-run: network
-	./network 2 2 1
+xor:
+	./network -e 2000 -b 1 -l 0.1 2 2 1
+
+
+mnist:
+	./network -e 5 -b 1 -l 0.01 784 256 64 10
+
+
+run: network xor
+	@
 
 
 clean:
