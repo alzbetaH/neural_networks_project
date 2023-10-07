@@ -1,7 +1,7 @@
 #include "neuron.hpp"
 
-double Neuron::eta = 0.15;
-double Neuron::alpha = 0.5;
+float Neuron::eta = 0.15;
+float Neuron::alpha = 0.5;
 
 void Neuron::updateInputWeights(Layer &prevLayer)
 {
@@ -9,11 +9,11 @@ void Neuron::updateInputWeights(Layer &prevLayer)
     for (unsigned i = 0; i < prevLayer.size(); ++i)
     {
         Neuron &neuron = prevLayer[i];
-        double oldDeltaWeight = neuron.m_outWeights[m_myIndex].deltaweight;
+        float oldDeltaWeight = neuron.m_outWeights[m_myIndex].deltaweight;
 
-        double newDeltaWeight =
+        float newDeltaWeight =
             //eta = learning rate
-            eta 
+            eta
             * neuron.getOutputVal()
             * m_gradient
             //momentum
@@ -25,9 +25,9 @@ void Neuron::updateInputWeights(Layer &prevLayer)
     
 }
 
-double Neuron::sumDOW(const Layer &nextLayer) const
+float Neuron::sumDOW(const Layer &nextLayer) const
 {
-    double sum = 0.0;
+    float sum = 0.0;
 
     for (unsigned i = 0; i < nextLayer.size() - 1; ++i)
     {
@@ -39,22 +39,22 @@ double Neuron::sumDOW(const Layer &nextLayer) const
 
 void Neuron::calcHiddenGradients(const Layer &nextLayer)
 {
-    double dow = sumDOW(nextLayer);
+    float dow = sumDOW(nextLayer);
     m_gradient = dow * Neuron::transferFunctionDerivative(m_outVal);
 }
 
-void Neuron::calcOutputGradients(double targetVal)
+void Neuron::calcOutputGradients(float targetVal)
 {
-    double delta = targetVal - m_outVal;
+    float delta = targetVal - m_outVal;
     m_gradient = delta * Neuron::transferFunctionDerivative(m_outVal);
 }
 
-double Neuron::transferFunction(double x)
+float Neuron::transferFunction(float x)
 {
     return tanh(x);
 }
 
-double Neuron::transferFunctionDerivative(double x)
+float Neuron::transferFunctionDerivative(float x)
 {
     // 1.0 - x * x is derivative of tanh(x)
     return 1.0 - x * x;
@@ -62,7 +62,7 @@ double Neuron::transferFunctionDerivative(double x)
 
 void Neuron::feedForward(const Layer &prevLayer)
 {
-    double sum = 0.0;
+    float sum = 0.0;
 
     for (unsigned i = 0; i < prevLayer.size(); ++i)
     {

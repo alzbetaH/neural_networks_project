@@ -1,9 +1,9 @@
 #include "net.hpp"
 #include <cassert>
 
-double Net::m_recentAverageSmoothingFactor = 100.0;
+float Net::m_recentAverageSmoothingFactor = 100.0;
 
-void Net::getResults(vector<double> &resultVals) const 
+void Net::getResults(vector<float> &resultVals) const 
 {
     resultVals.clear();
 
@@ -15,7 +15,7 @@ void Net::getResults(vector<double> &resultVals) const
     
 }
 
-void Net::backProp(const vector<double> &targetVals) 
+void Net::backProp(const vector<float> &targetVals) 
 {
     //mean square error
     Layer &outputLayer = m_layers.back();
@@ -23,7 +23,7 @@ void Net::backProp(const vector<double> &targetVals)
 
     for (unsigned i = 0; i < outputLayer.size() - 1; ++i)
     {
-        double delta = targetVals[i] - outputLayer[i].getOutputVal();
+        float delta = targetVals[i] - outputLayer[i].getOutputVal();
         m_error += delta * delta;
     }
     m_error /= outputLayer.size() - 1;
@@ -68,7 +68,7 @@ void Net::backProp(const vector<double> &targetVals)
     
 }
 
-void Net::feedForward(const vector<double> &inputVals) 
+void Net::feedForward(const vector<float> &inputVals)
 {
     //the number of input values is the same as the number of input neurons
     // -1 because of bias

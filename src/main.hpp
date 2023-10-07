@@ -1,3 +1,4 @@
+#include <iostream>
 #include "net.hpp"
-#include "training_data.hpp"
-
+#include "input_data.hpp"
+#include "label_data.hpp"
