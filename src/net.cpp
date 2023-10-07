@@ -15,19 +15,28 @@ void Net::getResults(vector<float> &resultVals) const
     
 }
 
-void Net::backProp(const vector<float> &targetVals) 
+void Net::backProp(const vector<float> &targetVals)
 {
-    //mean square error
     Layer &outputLayer = m_layers.back();
-    m_error = 0.0;
 
-    for (unsigned i = 0; i < outputLayer.size() - 1; ++i)
+    // Mean squared error
+    // m_error = 0.0;
+    // for (unsigned i = 0; i < outputLayer.size() - 1; ++i)
+    // {
+    //     float delta = targetVals[i] - outputLayer[i].getOutputVal();
+    //     m_error += delta * delta;
+    // }
+    // m_error /= outputLayer.size() - 1;
+    // m_error = sqrt(m_error);
+
+    // Cross entropy loss
+    for(unsigned i = 0; i < outputLayer.size() - 1; ++i)
     {
-        float delta = targetVals[i] - outputLayer[i].getOutputVal();
-        m_error += delta * delta;
+        if(targetVals[i] == 1.0)
+        {
+            m_error = -log(outputLayer[i].getOutputVal());
+        }
     }
-    m_error /= outputLayer.size() - 1;
-    m_error = sqrt(m_error);
 
     m_recentAverageError =
         (m_recentAverageError * m_recentAverageSmoothingFactor + m_error)
