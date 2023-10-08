@@ -62,12 +62,16 @@ void Neuron::calcOutputGradients(float targetVal)
 float Neuron::transferFunction(float x)
 {
     return tanh(x);
+
+    // return x < 0 ? 0 : x; // ReLU !Doesn't work
 }
 
 float Neuron::transferFunctionDerivative(float x)
 {
     // 1.0 - x * x is derivative of tanh(x)
     return 1.0 - x * x;
+
+    // return x < 0 ? 0 : 1; // ReLU !Doesn't work
 }
 
 void Neuron::feedForward(const Layer &prevLayer)

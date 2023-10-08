@@ -1,7 +1,29 @@
 #include "net.hpp"
 #include <cassert>
+#include <limits>
 
 float Net::m_recentAverageSmoothingFactor = 100.0;
+
+Net::Net(const vector<unsigned> &topology)
+{
+
+    unsigned numLayers = topology.size();
+
+    for (unsigned layerNum = 0; layerNum < numLayers; ++layerNum) {
+        m_layers.push_back(Layer());
+
+        //if last layer no outputs are set
+        unsigned numOutputs = layerNum == topology.size() - 1 ? 0 : topology[layerNum + 1];
+        
+        //creating neurons according to given topology
+        for (unsigned neuronNum = 0; neuronNum <= topology[layerNum]; ++neuronNum) {
+            m_layers.back().push_back(Neuron(numOutputs, neuronNum));
+        }
+
+        //initial bias value
+        m_layers.back().back().setOutputVal(1.0);
+    }
+}
 
 void Net::getResults(vector<float> &resultVals) const 
 {
@@ -20,23 +42,31 @@ void Net::backProp(const vector<float> &targetVals)
     Layer &outputLayer = m_layers.back();
 
     // Mean squared error
-    // m_error = 0.0;
-    // for (unsigned i = 0; i < outputLayer.size() - 1; ++i)
-    // {
-    //     float delta = targetVals[i] - outputLayer[i].getOutputVal();
-    //     m_error += delta * delta;
-    // }
-    // m_error /= outputLayer.size() - 1;
-    // m_error = sqrt(m_error);
+    m_error = 0.0;
+    for (unsigned i = 0; i < outputLayer.size() - 1; ++i)
+    {
+        float delta = targetVals[i] - outputLayer[i].getOutputVal();
+        m_error += delta * delta;
+    }
+    m_error /= outputLayer.size() - 1;
+    m_error = sqrt(m_error);
 
     // Cross entropy loss
-    for(unsigned i = 0; i < outputLayer.size() - 1; ++i)
-    {
-        if(targetVals[i] == 1.0)
-        {
-            m_error = -log(outputLayer[i].getOutputVal());
-        }
-    }
+    // for(unsigned i = 0; i < outputLayer.size() - 1; ++i)
+    // {
+    //     if(targetVals[i] == 1.0)
+    //     {
+    //         m_error = -log(outputLayer[i].getOutputVal());
+    //     }
+    // }
+
+    // Categorical cross entropy loss
+    // m_error = 0;
+    // for(unsigned i = 0; i < outputLayer.size(); ++i)
+    // {
+    //     double outputVal = max(numeric_limits<float>::min(), outputLayer[i].getOutputVal()); // Avoid log(0)
+    //     m_error -= targetVals[i] * log(outputVal);
+    // }
 
     m_recentAverageError =
         (m_recentAverageError * m_recentAverageSmoothingFactor + m_error)
@@ -103,27 +133,3 @@ void Net::feedForward(const vector<float> &inputVals)
     }
     
 };
-
-Net::Net(const vector<unsigned> &topology)
-{
-
-    unsigned numLayers = topology.size();
-
-    for (unsigned layerNum = 0; layerNum < numLayers; ++layerNum) {
-        m_layers.push_back(Layer());
-
-        //if last layer no outputs are set
-        unsigned numOutputs = layerNum == topology.size() - 1 ? 0 : topology[layerNum + 1];
-        
-        //creating neurons according to given topology
-        for (unsigned neuronNum = 0; neuronNum <= topology[layerNum]; ++neuronNum) {
-            m_layers.back().push_back(Neuron(numOutputs, neuronNum));
-            cout << "Made a Neuron!" << endl;
-        }
-
-        //initial bias value
-        m_layers.back().back().setOutputVal(1.0);
-    }
-
-
-}

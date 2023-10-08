@@ -60,7 +60,6 @@ int main(int argc, char *argv[]){
     int option_index = 0;
     int c;
     while ((c = getopt_long(argc, argv, "e:l:b:", long_options, &option_index)) != -1) {
-        cout << option_index << endl;
         switch (c) {
             case 'e':
                 epochs = std::atoi(optarg);
@@ -101,12 +100,20 @@ int main(int argc, char *argv[]){
 
     Net myNet(topology);
 
-    // InputData trainingInputs("./data/fashion_mnist_train_vectors.csv", 255.0);
-    // LabelData trainingLabels("./data/fashion_mnist_train_labels.csv", 10, false);
-    // InputData testingInputs("./data/fashion_mnist_test_vectors.csv", 255.0);
+    // TODO can we select the task using arguments, too? Or would that be too much?
 
-    InputData trainingInputs("./data/xor_inputs.csv", 1.0);
-    LabelData trainingLabels("./data/xor_labels.csv", 1, true);
+    // InputData trainingInputs("./data/xor_inputs.csv", 1.0);
+    // LabelData trainingLabels("./data/xor_labels.csv", 1, true);
+
+    // InputData trainingInputs("./data/xor_inputs.csv", 1.0);
+    // LabelData trainingLabels("./data/and_or_labels.csv", 2, true);
+
+    // InputData trainingInputs("./data/iris_inputs.csv", 10.0);
+    // LabelData trainingLabels("./data/iris_labels.csv", 3, false);
+
+    InputData trainingInputs("./data/fashion_mnist_train_vectors.csv", 255.0);
+    LabelData trainingLabels("./data/fashion_mnist_train_labels.csv", 10, false);
+    InputData testingInputs("./data/fashion_mnist_test_vectors.csv", 255.0);
 
     vector<float> input, label, output;
 
