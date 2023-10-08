@@ -111,7 +111,7 @@ int main(int argc, char *argv[]){
     // InputData trainingInputs("./data/iris_inputs.csv", 10.0);
     // LabelData trainingLabels("./data/iris_labels.csv", 3, false);
 
-    InputData trainingInputs("./data/fashion_mnist_train_vectors.csv", 255.0);
+    InputData trainingInputs("./data/fashion_mnist_train_vectors.csv", 256.0);
     LabelData trainingLabels("./data/fashion_mnist_train_labels.csv", 10, false);
     InputData testingInputs("./data/fashion_mnist_test_vectors.csv", 255.0);
 
@@ -129,7 +129,7 @@ int main(int argc, char *argv[]){
 
         for(unsigned i = 0; i < trainingInputs.length(); ++i)
         {
-            cout << "Epoch " << epoch + 1 << ", pass " << i + 1 << endl;
+            cout << "Epoch " << epoch + 1 << ", batch " << i + 1 << endl;
 
             input = trainingInputs.getNext();
             label = trainingLabels.getNext();
@@ -142,12 +142,13 @@ int main(int argc, char *argv[]){
             //cout << "res val: " << output[0] << endl;
             showVectorVals("Outputs:", output);
 
-            showVectorVals("Targets:", label);
+            showVectorVals("Labels:", label);
             assert(label.size() == topology.back());
         
             myNet.backProp(label);
 
-            cout << "Net recent average error: " << myNet.getRecentAverageError() << endl;
+            cout << "Loss: " << myNet.getError() << endl;
+            cout << "Avg loss: " << myNet.getRecentAverageError() << endl;
         }
     }
 

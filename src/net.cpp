@@ -102,9 +102,6 @@ void Net::backProp(const vector<float> &targetVals)
         }
         
     }
-    
-    
-    
 }
 
 void Net::feedForward(const vector<float> &inputVals)
@@ -129,7 +126,5 @@ void Net::feedForward(const vector<float> &inputVals)
         {
             m_layers[layerNum][i].feedForward(prevLayer);
         }
-        
     }
-    
 };

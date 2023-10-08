@@ -1,7 +1,7 @@
 #include "neuron.hpp"
 
 float Neuron::eta = 0.15;
-float Neuron::alpha = 0.5;
+float Neuron::alpha = 0.1;
 
 Neuron::Neuron(unsigned numOutputs, unsigned myIndex)
 {
@@ -21,22 +21,20 @@ void Neuron::updateInputWeights(Layer &prevLayer)
         Neuron &neuron = prevLayer[i];
         float oldDeltaWeight = neuron.m_outWeights[m_myIndex].deltaweight;
 
+        // - (Learning rate * prev neuron output * gradient) + momentum * old weight change
         float newDeltaWeight =
-            //eta = learning rate
-            eta
-            * neuron.getOutputVal()
-            * m_gradient
-            //momentum
-            + alpha
-            * oldDeltaWeight;
+            -(eta * neuron.getOutputVal() * m_gradient) + alpha * oldDeltaWeight;
+
         neuron.m_outWeights[m_myIndex].deltaweight = newDeltaWeight;
         neuron.m_outWeights[m_myIndex].weight += newDeltaWeight;
     }
-    
 }
 
 float Neuron::sumDOW(const Layer &nextLayer) const
 {
+    /**
+     * @brief Sum of derivatives of weights
+     */
     float sum = 0.0;
 
     for (unsigned i = 0; i < nextLayer.size() - 1; ++i)
@@ -55,7 +53,7 @@ void Neuron::calcHiddenGradients(const Layer &nextLayer)
 
 void Neuron::calcOutputGradients(float targetVal)
 {
-    float delta = targetVal - m_outVal;
+    float delta = m_outVal - targetVal;
     m_gradient = delta * Neuron::transferFunctionDerivative(m_outVal);
 }
 
@@ -68,8 +66,7 @@ float Neuron::transferFunction(float x)
 
 float Neuron::transferFunctionDerivative(float x)
 {
-    // 1.0 - x * x is derivative of tanh(x)
-    return 1.0 - x * x;
+    return 1.0 - x * x; // approximate derivative of tanh
 
     // return x < 0 ? 0 : 1; // ReLU !Doesn't work
 }

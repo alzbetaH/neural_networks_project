@@ -19,4 +19,5 @@ public:
     void backProp(const vector<float> &targetVals);
     void getResults(vector<float> &resultVals) const;
     float getRecentAverageError(void) const {return m_recentAverageError;};
+    float getError(void) const {return m_error;};
 };
