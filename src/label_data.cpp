@@ -60,6 +60,23 @@ vector<float> LabelData::onehotEncode(unsigned label)
     return encoded;
 }
 
+unsigned LabelData::onehotDecode(const std::vector<float>& encoded) {
+    if (encoded.size() != m_categories) {
+        throw std::runtime_error("Invalid one-hot encoded vector size");
+    }
+
+    // Find the iterator pointing to the maximum element in the encoded vector.
+    auto max_it = std::max_element(encoded.begin(), encoded.end());
+
+    // Check if the maximum element is 1 (as expected in one-hot encoding).
+    if (*max_it != 1.0) {
+        throw std::runtime_error("Invalid one-hot encoded vector");
+    }
+
+    // Calculate and return the index of the maximum element, which is the original label.
+    return static_cast<unsigned>(distance(encoded.begin(), max_it));
+}
+
 void LabelData::shuffleData(unsigned seed)
 {
     shuffle(m_data.begin(), m_data.end(), default_random_engine(seed));

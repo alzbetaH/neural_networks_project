@@ -17,7 +17,7 @@ public:
 
     void readData();
     vector<float> onehotEncode(unsigned label);
-    // unsigned onehotDecode(vector<float>); // TODO?
+    unsigned onehotDecode(const std::vector<float>& encoded);
     void shuffleData(unsigned seed);
     vector<float> &getNext();
     // vector<vector<float>> getBatch(); // TODO?
