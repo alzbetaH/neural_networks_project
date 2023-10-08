@@ -12,11 +12,15 @@ network: $(SOURCES)
 	g++ -std=c++17 -Wall -O3 -Ofast $(SOURCES) -o network -g
 
 
-xor:
+xor: network
 	./network -e 2000 -b 1 -l 0.1 2 2 1
 
 
-mnist:
+iris: network
+	./network -e 5000 -b 1 -l 0.01 4 10 3
+
+
+mnist: network
 	./network -e 5 -b 1 -l 0.01 784 256 64 10
 
 
