@@ -3,14 +3,24 @@
 float Neuron::eta = 0.15;
 float Neuron::alpha = 0.1;
 
-Neuron::Neuron(unsigned numOutputs, unsigned myIndex)
+Neuron::Neuron(unsigned numNetworkInputs, unsigned numNeuronOutputs, unsigned neuronIndex)
 {
-    for (unsigned c = 0; c < numOutputs; ++c)
+    for (unsigned c = 0; c < numNeuronOutputs; ++c)
     {
         m_outWeights.push_back(Connection());
-        m_outWeights.back().weight = randomWeight();
+        m_outWeights.back().weight = heWeightInit(numNetworkInputs);
     }
-    m_myIndex = myIndex;
+    m_myIndex = neuronIndex;
+}
+
+float Neuron::heWeightInit(unsigned numNetworkInputs) {
+    /**
+     * @brief He weight initialization
+     */
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::normal_distribution<> dis(0, std::sqrt(2.0 / numNetworkInputs));
+    return dis(gen);
 }
 
 void Neuron::updateInputWeights(Layer &prevLayer)
@@ -61,14 +71,14 @@ float Neuron::transferFunction(float x)
 {
     return tanh(x);
 
-    // return x < 0 ? 0 : x; // ReLU !Doesn't work
+    // return max(0.0f, x); // ReLU !Doesn't work
 }
 
 float Neuron::transferFunctionDerivative(float x)
 {
     return 1.0 - x * x; // approximate derivative of tanh
 
-    // return x < 0 ? 0 : 1; // ReLU !Doesn't work
+    // return x < 0.0f ? 0.0f : 1.0f; // ReLU !Doesn't work
 }
 
 void Neuron::feedForward(const Layer &prevLayer)

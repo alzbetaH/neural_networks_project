@@ -17,7 +17,7 @@ Net::Net(const vector<unsigned> &topology)
         
         //creating neurons according to given topology
         for (unsigned neuronNum = 0; neuronNum <= topology[layerNum]; ++neuronNum) {
-            m_layers.back().push_back(Neuron(numOutputs, neuronNum));
+            m_layers.back().push_back(Neuron(topology[0], numOutputs, neuronNum));
         }
 
         //initial bias value

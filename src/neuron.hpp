@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
+#include <random>
 
 using namespace std;
 class Neuron;
@@ -21,7 +22,7 @@ private:
     static float alpha; //[0.0...n] multiplier of last weight change (momentum) 
     static float transferFunction(float x);
     static float transferFunctionDerivative(float x);
-    static float randomWeight(void) { return rand() / float(RAND_MAX); }
+    static float heWeightInit(unsigned numNetworkInputs);
     float sumDOW(const Layer &nextLayer) const;
     float m_outVal;
     vector<Connection> m_outWeights;
@@ -29,7 +30,7 @@ private:
     float m_gradient;
 
 public:
-    Neuron(unsigned numOutVals, unsigned myIndex);
+    Neuron(unsigned numNetworkInputs, unsigned numNeuronOutputs, unsigned neuronIndex);
     void setOutputVal(float val) { m_outVal = val;}
     float getOutputVal(void) const { return m_outVal; }
     void feedForward(const Layer &prevLayer);
