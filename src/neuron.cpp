@@ -3,23 +3,23 @@
 float Neuron::eta = 0.15;
 float Neuron::alpha = 0.1;
 
-Neuron::Neuron(unsigned numNetworkInputs, unsigned numNeuronOutputs, unsigned neuronIndex)
+Neuron::Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neuronIndex)
 {
     for (unsigned c = 0; c < numNeuronOutputs; ++c)
     {
         m_outWeights.push_back(Connection());
-        m_outWeights.back().weight = heWeightInit(numNetworkInputs);
+        m_outWeights.back().weight = heWeightInit(numLayerInputs);
     }
     m_myIndex = neuronIndex;
 }
 
-float Neuron::heWeightInit(unsigned numNetworkInputs) {
+float Neuron::heWeightInit(unsigned numLayerInputs) {
     /**
      * @brief He weight initialization
      */
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::normal_distribution<> dis(0, std::sqrt(2.0 / numNetworkInputs));
+    std::normal_distribution<> dis(0, std::sqrt(2.0 / numLayerInputs));
     return dis(gen);
 }
 
