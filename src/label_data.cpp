@@ -84,11 +84,12 @@ void LabelData::shuffleData(unsigned seed)
 
 vector<float> &LabelData::getNext()
 {
+    int idx_to_ret = m_actIndex;
     m_actIndex++;
     if(m_actIndex == m_data.size())
     {
         m_actIndex = 0;
     }
 
-    return m_data[m_actIndex];
+    return m_data[idx_to_ret];
 }
