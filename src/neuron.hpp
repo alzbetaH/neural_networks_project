@@ -24,10 +24,12 @@ private:
     static float transferFunctionDerivative(float x);
     static float heWeightInit(unsigned numNetworkInputs);
     float sumDOW(const Layer &nextLayer) const;
+    float potential;
     float m_outVal;
     vector<Connection> m_outWeights;
     unsigned m_myIndex;
     float m_gradient;
+    float avg_gradient{0};
 
 public:
     Neuron(unsigned numNetworkInputs, unsigned numNeuronOutputs, unsigned neuronIndex);
@@ -37,6 +39,8 @@ public:
     void calcOutputGradients(float targetVal);
     void calcHiddenGradients(const Layer &nextLayer);
     void updateInputWeights(Layer &prevLayer);
+    void addToAvgBatchGradient();
+    float setAvgGradient(unsigned int batchSize);
 
     static void setLearningRate(float learningRate);
 };
