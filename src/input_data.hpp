@@ -17,7 +17,9 @@ public:
     void readData();
     void shuffleData(unsigned seed);
     vector<float> &getNext();
-    // vector<vector<float>> getBatch(); // TODO?
+    void getBatch(int batch_size); // TODO?
+    vector<float> &getNextInBatch(int batch_size);
+    int getActualBatchSize();
 
     inline unsigned length() { return m_data.size(); }
 
@@ -26,5 +28,8 @@ private:
     const float m_divisor; // To normalize the data, divide it by this number when reading
 
     unsigned m_actIndex;
+    unsigned m_batchIndex;
+    unsigned act_batch_size;
     vector<vector<float>> m_data;
+    vector<vector<float>> mini_batch;
 };
