@@ -50,6 +50,7 @@ float Neuron::sumDOW(const Layer &nextLayer) const
     for (unsigned i = 0; i < nextLayer.size() - 1; ++i)
     {
         sum += m_outWeights[i].weight * nextLayer[i].m_gradient;
+        //sum += m_outWeights[i].weight * nextLayer[i].m_gradient * Neuron::transferFunctionDerivative(nextLayer[i].potential);
     }
     
     return sum;
@@ -58,12 +59,14 @@ float Neuron::sumDOW(const Layer &nextLayer) const
 void Neuron::calcHiddenGradients(const Layer &nextLayer)
 {
     float dow = sumDOW(nextLayer);
+    // m_gradient = dow;
     m_gradient = dow * Neuron::transferFunctionDerivative(m_outVal);
 }
 
 void Neuron::calcOutputGradients(float targetVal)
 {
     float delta = m_outVal - targetVal;
+    // m_gradient = delta; 
     m_gradient = delta * Neuron::transferFunctionDerivative(m_outVal);
 }
 
@@ -89,10 +92,23 @@ void Neuron::feedForward(const Layer &prevLayer)
     {
         sum += prevLayer[i].getOutputVal() * prevLayer[i].m_outWeights[m_myIndex].weight;
     }
+    potential = sum;
     m_outVal = Neuron::transferFunction(sum);
 }
 
 void Neuron::setLearningRate(float learningRate)
 {
     eta = learningRate;
+}
+
+void Neuron::addToAvgBatchGradient()
+{
+    avg_gradient += m_gradient;
+}
+
+float Neuron::setAvgGradient(unsigned int batchSize)
+{
+    float ret_avg_gradient = avg_gradient / batchSize;
+    avg_gradient = 0;
+    return ret_avg_gradient;
 }

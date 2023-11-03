@@ -17,7 +17,10 @@ public:
     Net(const vector<unsigned> &topology);
     void feedForward(const vector<float> &inputVals);
     void backProp(const vector<float> &targetVals);
+    void updateWeights();
     void getResults(vector<float> &resultVals) const;
     float getRecentAverageError(void) const {return m_recentAverageError;};
     float getError(void) const {return m_error;};
+    float getIndex();
+    void setAvgGradient(unsigned int batchSize);
 };

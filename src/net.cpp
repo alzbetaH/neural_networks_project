@@ -41,15 +41,24 @@ void Net::backProp(const vector<float> &targetVals)
 {
     Layer &outputLayer = m_layers.back();
 
-    // Mean squared error
+    //Huber loss
     m_error = 0.0;
     for (unsigned i = 0; i < outputLayer.size() - 1; ++i)
     {
         float delta = targetVals[i] - outputLayer[i].getOutputVal();
         m_error += delta * delta;
     }
-    m_error /= outputLayer.size() - 1;
-    m_error = sqrt(m_error);
+    m_error = m_error / 2;
+
+    // // Root mean squared error
+    // m_error = 0.0;
+    // for (unsigned i = 0; i < outputLayer.size() - 1; ++i)
+    // {
+    //     float delta = targetVals[i] - outputLayer[i].getOutputVal();
+    //     m_error += delta * delta;
+    // }
+    // m_error /= outputLayer.size() - 1;
+    // m_error = sqrt(m_error);
 
     // Cross entropy loss
     // for(unsigned i = 0; i < outputLayer.size() - 1; ++i)
@@ -76,6 +85,7 @@ void Net::backProp(const vector<float> &targetVals)
     for (unsigned i = 0; i < outputLayer.size() -1; ++i)
     {
         outputLayer[i].calcOutputGradients(targetVals[i]);
+        // outputLayer[i].addToAvgBatchGradient();
     }
 
     //gradients on hidden layers
@@ -87,9 +97,15 @@ void Net::backProp(const vector<float> &targetVals)
         for (unsigned i = 0; i < hiddenLayer.size(); ++i)
         {
             hiddenLayer[i].calcHiddenGradients(nextLayer);
+            // outputLayer[i].addToAvgBatchGradient();
         }
         
     }
+
+}
+
+void Net::updateWeights()
+{
     //for all layers from outputs to first hidden layer update connection weights
     for (unsigned layerNum = m_layers.size() - 1; layerNum > 0; --layerNum)
     {
@@ -128,3 +144,17 @@ void Net::feedForward(const vector<float> &inputVals)
         }
     }
 };
+
+void Net::setAvgGradient(unsigned int batchSize)
+{
+    for (unsigned layerNum = m_layers.size() - 1; layerNum > 0 ; --layerNum)
+    {
+        Layer &actLayer = m_layers[layerNum];
+
+        for (unsigned i = 0; i < actLayer.size(); ++i)
+        {
+            actLayer[i].setAvgGradient(batchSize + 1);
+        }
+        
+    }
+}
