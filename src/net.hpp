@@ -23,4 +23,5 @@ public:
     float getError(void) const {return m_error;};
     float getIndex();
     void setAvgGradient(unsigned int batchSize);
+    void resetGradientSum();
 };

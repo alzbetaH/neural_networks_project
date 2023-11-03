@@ -29,7 +29,7 @@ private:
     vector<Connection> m_outWeights;
     unsigned m_myIndex;
     float m_gradient;
-    float avg_gradient{0};
+    float m_gradient_sum{0};
 
 public:
     Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neuronIndex);
@@ -41,6 +41,7 @@ public:
     void updateInputWeights(Layer &prevLayer);
     void addToAvgBatchGradient();
     float setAvgGradient(unsigned int batchSize);
+    void resetGradientSum();
 
     static void setLearningRate(float learningRate);
 };

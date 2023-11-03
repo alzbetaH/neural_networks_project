@@ -25,18 +25,19 @@ float Neuron::heWeightInit(unsigned numLayerInputs) {
 
 void Neuron::updateInputWeights(Layer &prevLayer)
 {
-    //including bias
+    // For all neurons of the prevoius layer, including bias
     for (unsigned i = 0; i < prevLayer.size(); ++i)
     {
-        Neuron &neuron = prevLayer[i];
-        float oldDeltaWeight = neuron.m_outWeights[m_myIndex].deltaweight;
+        Neuron &prev_neuron = prevLayer[i];
+        float oldDeltaWeight = prev_neuron.m_outWeights[m_myIndex].deltaweight;
 
         // - (Learning rate * prev neuron output * gradient) + momentum * old weight change
         float newDeltaWeight =
-            -(eta * neuron.getOutputVal() * m_gradient) + alpha * oldDeltaWeight;
+            -(eta * prev_neuron.getOutputVal() * m_gradient) + alpha * oldDeltaWeight;
+        // cout << "using gradient " << m_gradient << endl;
 
-        neuron.m_outWeights[m_myIndex].deltaweight = newDeltaWeight;
-        neuron.m_outWeights[m_myIndex].weight += newDeltaWeight;
+        prev_neuron.m_outWeights[m_myIndex].deltaweight = newDeltaWeight;
+        prev_neuron.m_outWeights[m_myIndex].weight += newDeltaWeight;
     }
 }
 
@@ -66,7 +67,7 @@ void Neuron::calcHiddenGradients(const Layer &nextLayer)
 void Neuron::calcOutputGradients(float targetVal)
 {
     float delta = m_outVal - targetVal;
-    // m_gradient = delta; 
+    // m_gradient = delta;
     m_gradient = delta * Neuron::transferFunctionDerivative(m_outVal);
 }
 
@@ -103,12 +104,18 @@ void Neuron::setLearningRate(float learningRate)
 
 void Neuron::addToAvgBatchGradient()
 {
-    avg_gradient += m_gradient;
+    m_gradient_sum += m_gradient;
+    // cout << "add " << m_gradient << endl;
+    // cout << "sum " << m_gradient_sum << endl;
 }
 
 float Neuron::setAvgGradient(unsigned int batchSize)
 {
-    float ret_avg_gradient = avg_gradient / batchSize;
-    avg_gradient = 0;
-    return ret_avg_gradient;
+    m_gradient = m_gradient_sum / batchSize;
+    // cout << "avg " << m_gradient << endl;
+    return m_gradient;
+}
+
+void Neuron::resetGradientSum(){
+    m_gradient_sum = 0;
 }

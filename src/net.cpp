@@ -41,7 +41,7 @@ void Net::backProp(const vector<float> &targetVals)
 {
     Layer &outputLayer = m_layers.back();
 
-    //Huber loss
+    // Huber loss
     m_error = 0.0;
     for (unsigned i = 0; i < outputLayer.size() - 1; ++i)
     {
@@ -50,7 +50,7 @@ void Net::backProp(const vector<float> &targetVals)
     }
     m_error = m_error / 2;
 
-    // // Root mean squared error
+    // Root mean squared error
     // m_error = 0.0;
     // for (unsigned i = 0; i < outputLayer.size() - 1; ++i)
     // {
@@ -82,10 +82,10 @@ void Net::backProp(const vector<float> &targetVals)
         / (m_recentAverageSmoothingFactor + 1.0);
 
     //gradients for output neurons
-    for (unsigned i = 0; i < outputLayer.size() -1; ++i)
+    for (unsigned i = 0; i < outputLayer.size() - 1; ++i) // -1 to skip the bias
     {
         outputLayer[i].calcOutputGradients(targetVals[i]);
-        // outputLayer[i].addToAvgBatchGradient();
+        outputLayer[i].addToAvgBatchGradient();
     }
 
     //gradients on hidden layers
@@ -97,7 +97,7 @@ void Net::backProp(const vector<float> &targetVals)
         for (unsigned i = 0; i < hiddenLayer.size(); ++i)
         {
             hiddenLayer[i].calcHiddenGradients(nextLayer);
-            // outputLayer[i].addToAvgBatchGradient();
+            hiddenLayer[i].addToAvgBatchGradient();
         }
         
     }
@@ -148,13 +148,26 @@ void Net::feedForward(const vector<float> &inputVals)
 void Net::setAvgGradient(unsigned int batchSize)
 {
     for (unsigned layerNum = m_layers.size() - 1; layerNum > 0 ; --layerNum)
+    // for (unsigned layerNum = 1; layerNum < m_layers.size(); ++layerNum)
     {
         Layer &actLayer = m_layers[layerNum];
 
         for (unsigned i = 0; i < actLayer.size(); ++i)
         {
-            actLayer[i].setAvgGradient(batchSize + 1);
+            actLayer[i].setAvgGradient(batchSize);
         }
-        
+    }
+}
+
+void Net::resetGradientSum(){
+    for (unsigned layerNum = m_layers.size() - 1; layerNum > 0 ; --layerNum)
+    // for (unsigned layerNum = 1; layerNum < m_layers.size(); ++layerNum)
+    {
+        Layer &actLayer = m_layers[layerNum];
+
+        for (unsigned i = 0; i < actLayer.size(); ++i)
+        {
+            actLayer[i].resetGradientSum();
+        }
     }
 }

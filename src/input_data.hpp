@@ -29,7 +29,7 @@ private:
 
     unsigned m_actIndex;
     unsigned m_batchIndex;
-    unsigned act_batch_size;
+    unsigned m_act_batch_size;
     vector<vector<float>> m_data;
-    vector<vector<float>> mini_batch;
+    vector<vector<float>> m_batch;
 };

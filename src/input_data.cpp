@@ -42,19 +42,19 @@ void InputData::shuffleData(unsigned seed)
     shuffle(m_data.begin(), m_data.end(), default_random_engine(seed));
 }
 
-void InputData::getBatch(int batch_size) 
+void InputData::getBatch(int batch_size)
 {
-    mini_batch.clear();
-    for (int i = m_batchIndex; i < batch_size; ++i)
+    m_batch.clear();
+    for (int i = 0; i < batch_size; ++i)
     {
-        mini_batch.push_back(m_data[m_actIndex + i]);
+        m_batch.push_back(m_data[m_actIndex + i]);
 
-        if (m_actIndex == m_data.size() - 1)
+        if (m_actIndex + i + 1 == m_data.size())
         {
             break;
         }
     }
-    act_batch_size = mini_batch.size();
+    m_act_batch_size = m_batch.size();
 }
 
 vector<float> &InputData::getNextInBatch(int batch_size)
@@ -72,7 +72,7 @@ vector<float> &InputData::getNextInBatch(int batch_size)
         m_batchIndex = 0;
     }
 
-    return mini_batch[batch_idx_to_ret];
+    return m_batch[batch_idx_to_ret];
 }
 
 vector<float> &InputData::getNext()
@@ -89,5 +89,5 @@ vector<float> &InputData::getNext()
 
 int InputData::getActualBatchSize()
 {
-    return act_batch_size;
+    return m_act_batch_size;
 }

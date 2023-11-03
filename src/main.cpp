@@ -102,8 +102,8 @@ int main(int argc, char *argv[]){
 
     // TODO can we select the task using arguments, too? Or would that be too much?
 
-    InputData trainingInputs("./data/xor_inputs.csv", 1.0);
-    LabelData trainingLabels("./data/xor_labels.csv", 1, true);
+    // InputData trainingInputs("./data/xor_inputs.csv", 1.0);
+    // LabelData trainingLabels("./data/xor_labels.csv", 1, true);
 
     // InputData trainingInputs("./data/xor_inputs.csv", 1.0);
     // LabelData trainingLabels("./data/and_or_labels.csv", 2, true);
@@ -111,32 +111,37 @@ int main(int argc, char *argv[]){
     // InputData trainingInputs("./data/iris_inputs.csv", 10.0);
     // LabelData trainingLabels("./data/iris_labels.csv", 3, false);
 
-    // InputData trainingInputs("./data/fashion_mnist_train_vectors.csv", 256.0);
-    // LabelData trainingLabels("./data/fashion_mnist_train_labels.csv", 10, false);
-    // InputData testingInputs("./data/fashion_mnist_test_vectors.csv", 255.0);
+    InputData trainingInputs("./data/fashion_mnist_train_vectors.csv", 255.0);
+    LabelData trainingLabels("./data/fashion_mnist_train_labels.csv", 10, false);
+    InputData testingInputs("./data/fashion_mnist_test_vectors.csv", 255.0);
 
     vector<float> input, label, output;
     
     int actual_batch_size;
+    // TODO if batch size > size of dataset, batch size = size of dataset
     for(unsigned epoch = 0; epoch < epochs; ++epoch)
     {
         cout << "==================================================" << endl;
         cout << "Epoch " << epoch + 1 << endl;
 
         // Shuffle the training data
-        unsigned seed = static_cast<unsigned>(time(nullptr));
+        // TODO Random seed
+        // unsigned seed = static_cast<unsigned>(time(nullptr));
+        unsigned seed = 3;
         trainingInputs.shuffleData(seed);
         trainingLabels.shuffleData(seed);
-        
-        for(unsigned i = 0; i < trainingInputs.length(); ++i)
-        {
-            cout << "Epoch " << epoch + 1 << endl;
 
+        for(unsigned batch = 0; batch < ceil(trainingInputs.length() / batchSize); ++batch)
+        {
+            cout << "--------------------------------------------------" << endl;
+            cout << "Batch " << batch + 1 << endl;
             trainingInputs.getBatch(batchSize);
             actual_batch_size = trainingInputs.getActualBatchSize();
-            for (unsigned batch = 0; batch < actual_batch_size; batch++)
+            myNet.resetGradientSum();
+
+            for (unsigned i = 0; i < actual_batch_size; i++)
             {
-                cout << "Batch " << batch + 1 << endl;
+                cout << "Epoch : Batch : Sample -> " << epoch + 1 << " : " << batch + 1 << " : " << i + 1 << endl;
                 input = trainingInputs.getNextInBatch(batchSize);
                 label = trainingLabels.getNext();
 
@@ -144,7 +149,7 @@ int main(int argc, char *argv[]){
                 myNet.feedForward(input);
 
                 myNet.getResults(output);
-                //cout << "out: " << m_layers.back()[i].getOutputVal() << endl;
+                //cout << "out: " << m_layers.back()[batch].getOutputVal() << endl;
                 //cout << "res val: " << output[0] << endl;
                 showVectorVals("Outputs:", output);
 
@@ -152,13 +157,12 @@ int main(int argc, char *argv[]){
                 assert(label.size() == topology.back());
             
                 myNet.backProp(label);
-                myNet.updateWeights();
 
                 cout << "Loss: " << myNet.getError() << endl;
                 cout << "Avg loss: " << myNet.getRecentAverageError() << endl;
             }
-            // myNet.setAvgGradient(batchSize);
-            //myNet.updateWeights();
+            myNet.setAvgGradient(actual_batch_size);
+            myNet.updateWeights();
         }
     }
 
@@ -174,7 +178,7 @@ int main(int argc, char *argv[]){
 
     //     for(unsigned i = 0; i < trainingInputs.length(); ++i)
     //     {
-    //         cout << "Epoch " << epoch + 1 << ", batch " << i + 1 << endl;
+    //         cout << "Epoch " << epoch + 1 << ", i " << i + 1 << endl;
 
     //         input = trainingInputs.getNext();
     //         label = trainingLabels.getNext();
