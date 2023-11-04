@@ -18,7 +18,7 @@ public:
     void shuffleData(unsigned seed);
     vector<float> &getNext();
     void getBatch(int batch_size); // TODO?
-    vector<float> &getNextInBatch(int batch_size);
+    vector<float> &getNextInBatch(unsigned batch_size);
     int getActualBatchSize();
 
     inline unsigned length() { return m_data.size(); }

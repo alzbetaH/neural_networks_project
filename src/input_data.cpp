@@ -44,6 +44,10 @@ void InputData::shuffleData(unsigned seed)
 
 void InputData::getBatch(int batch_size)
 {
+    /**
+     * @brief Prepare a new batch - vector of input samples. A batch can be
+     * smaller than the batch_size if the end of data is reached
+     */
     m_batch.clear();
     for (int i = 0; i < batch_size; ++i)
     {
@@ -57,7 +61,7 @@ void InputData::getBatch(int batch_size)
     m_act_batch_size = m_batch.size();
 }
 
-vector<float> &InputData::getNextInBatch(int batch_size)
+vector<float> &InputData::getNextInBatch(unsigned batch_size)
 {
     m_actIndex++;
     if(m_actIndex == m_data.size())

@@ -1,6 +1,7 @@
 #include <cassert>
 #include <cmath>
 #include <getopt.h>
+#include <algorithm> // TODO can we use that?
 
 #include "main.hpp"
 
@@ -104,20 +105,23 @@ int main(int argc, char *argv[]){
 
     // InputData trainingInputs("./data/xor_inputs.csv", 1.0);
     // LabelData trainingLabels("./data/xor_labels.csv", 1, true);
+    // InputData testingInputs = trainingInputs;
 
     // InputData trainingInputs("./data/xor_inputs.csv", 1.0);
     // LabelData trainingLabels("./data/and_or_labels.csv", 2, true);
+    // InputData testingInputs = trainingInputs;
 
-    // InputData trainingInputs("./data/iris_inputs.csv", 10.0);
-    // LabelData trainingLabels("./data/iris_labels.csv", 3, false);
+    InputData trainingInputs("./data/iris_inputs.csv", 10.0);
+    LabelData trainingLabels("./data/iris_labels.csv", 3, false);
+    InputData testingInputs = trainingInputs;
 
-    InputData trainingInputs("./data/fashion_mnist_train_vectors.csv", 255.0);
-    LabelData trainingLabels("./data/fashion_mnist_train_labels.csv", 10, false);
-    InputData testingInputs("./data/fashion_mnist_test_vectors.csv", 255.0);
+    // InputData trainingInputs("./data/fashion_mnist_train_vectors.csv", 255.0);
+    // LabelData trainingLabels("./data/fashion_mnist_train_labels.csv", 10, false);
+    // InputData testingInputs("./data/fashion_mnist_test_vectors.csv", 255.0);
 
     vector<float> input, label, output;
-    
-    int actual_batch_size;
+
+    unsigned actual_batch_size;
     // TODO if batch size > size of dataset, batch size = size of dataset
     for(unsigned epoch = 0; epoch < epochs; ++epoch)
     {
@@ -125,9 +129,7 @@ int main(int argc, char *argv[]){
         cout << "Epoch " << epoch + 1 << endl;
 
         // Shuffle the training data
-        // TODO Random seed
-        // unsigned seed = static_cast<unsigned>(time(nullptr));
-        unsigned seed = 3;
+        unsigned seed = static_cast<unsigned>(time(nullptr));
         trainingInputs.shuffleData(seed);
         trainingLabels.shuffleData(seed);
 
@@ -161,46 +163,30 @@ int main(int argc, char *argv[]){
                 cout << "Loss: " << myNet.getError() << endl;
                 cout << "Avg loss: " << myNet.getRecentAverageError() << endl;
             }
-            myNet.setAvgGradient(actual_batch_size);
+            myNet.calcAvgGradient(actual_batch_size);
             myNet.updateWeights();
         }
     }
 
-    // for(unsigned epoch = 0; epoch < epochs; ++epoch)
-    // {
-    //     cout << "==================================================" << endl;
-    //     cout << "Epoch " << epoch + 1 << endl;
+    cout << "Done training, begin testing" << endl;
 
-    //     // Shuffle the training data
-    //     unsigned seed = static_cast<unsigned>(time(nullptr));
-    //     trainingInputs.shuffleData(seed);
-    //     trainingLabels.shuffleData(seed);
+    string test_labels_filepath = "test_labels.csv";
+    ofstream file(test_labels_filepath);
+    if(!file.is_open())
+    {
+        throw runtime_error("Unable to open file: " + test_labels_filepath);
+    }
+    for(unsigned i = 0; i < testingInputs.length(); ++i)
+    {
+        input = testingInputs.getNext();
+        myNet.feedForward(input);
+        myNet.getResults(output);
 
-    //     for(unsigned i = 0; i < trainingInputs.length(); ++i)
-    //     {
-    //         cout << "Epoch " << epoch + 1 << ", i " << i + 1 << endl;
+        // Get the index of the maximum value in the output vector
+        auto maxElementIter = max_element(output.begin(), output.end());
+        unsigned index = distance(output.begin(), maxElementIter);
+        file << index << endl;
+    }
 
-    //         input = trainingInputs.getNext();
-    //         label = trainingLabels.getNext();
-
-    //         // showVectorVals(": Inputs:", input);
-    //         myNet.feedForward(input);
-
-    //         myNet.getResults(output);
-    //         //cout << "out: " << m_layers.back()[i].getOutputVal() << endl;
-    //         //cout << "res val: " << output[0] << endl;
-    //         showVectorVals("Outputs:", output);
-
-    //         showVectorVals("Labels:", label);
-    //         assert(label.size() == topology.back());
-        
-    //         myNet.backProp(label);
-    //         myNet.updateWeights();
-    //         cout << "Loss: " << myNet.getError() << endl;
-    //         cout << "Avg loss: " << myNet.getRecentAverageError() << endl;
-    //     }
-    // }
-
-
-    cout << endl << "Done" << endl;
+    cout << "Done testing" << endl;
 }

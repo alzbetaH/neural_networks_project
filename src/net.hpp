@@ -21,7 +21,6 @@ public:
     void getResults(vector<float> &resultVals) const;
     float getRecentAverageError(void) const {return m_recentAverageError;};
     float getError(void) const {return m_error;};
-    float getIndex();
-    void setAvgGradient(unsigned int batchSize);
+    void calcAvgGradient(unsigned int batchSize);
     void resetGradientSum();
 };

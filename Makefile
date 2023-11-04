@@ -14,14 +14,17 @@ network: $(SOURCES)
 
 xor: network
 	./network -e 2000 -b 1 -l 0.1 2 2 1
+	python3 evaluator/evaluate.py ./test_labels.csv ./data/xor_labels.csv
 
 
 iris: network
 	./network -e 5000 -b 1 -l 0.01 4 10 3
+	python3 evaluator/evaluate.py ./test_labels.csv ./data/iris_labels.csv
 
 
 mnist: network
 	./network -e 5 -b 1 -l 0.01 784 256 64 10
+	python3 evaluator/evaluate.py ./test_labels.csv ./data/fashion_mnist_test_labels.csv
 
 
 run: network xor

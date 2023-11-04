@@ -24,7 +24,7 @@ private:
     static float transferFunctionDerivative(float x);
     static float heWeightInit(unsigned numLayerInputs);
     float sumDOW(const Layer &nextLayer) const;
-    float potential;
+    float m_potential;
     float m_outVal;
     vector<Connection> m_outWeights;
     unsigned m_myIndex;
@@ -39,8 +39,7 @@ public:
     void calcOutputGradients(float targetVal);
     void calcHiddenGradients(const Layer &nextLayer);
     void updateInputWeights(Layer &prevLayer);
-    void addToAvgBatchGradient();
-    float setAvgGradient(unsigned int batchSize);
+    void calcAvgGradient(unsigned int batchSize);
     void resetGradientSum();
 
     static void setLearningRate(float learningRate);

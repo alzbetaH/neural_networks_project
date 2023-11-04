@@ -4,7 +4,7 @@
 
 float Net::m_recentAverageSmoothingFactor = 100.0;
 
-Net::Net(const vector<unsigned> &topology)
+Net::Net(const vector<unsigned> &topology) : m_error(0.0), m_recentAverageError(0.0)
 {
 
     unsigned numLayers = topology.size();
@@ -12,15 +12,15 @@ Net::Net(const vector<unsigned> &topology)
     for (unsigned layerNum = 0; layerNum < numLayers; ++layerNum) {
         m_layers.push_back(Layer());
 
-        //if last layer no outputs are set
+        // if last layer no outputs are set
         unsigned numOutputs = layerNum == topology.size() - 1 ? 0 : topology[layerNum + 1];
-        
-        //creating neurons according to given topology
+
+        // creating neurons according to given topology (one additional for bias)
         for (unsigned neuronNum = 0; neuronNum <= topology[layerNum]; ++neuronNum) {
             m_layers.back().push_back(Neuron(topology[layerNum], numOutputs, neuronNum));
         }
 
-        //initial bias value
+        // bias value
         m_layers.back().back().setOutputVal(1.0);
     }
 }
@@ -41,24 +41,24 @@ void Net::backProp(const vector<float> &targetVals)
 {
     Layer &outputLayer = m_layers.back();
 
-    // Huber loss
+    // Mean squared error
     m_error = 0.0;
     for (unsigned i = 0; i < outputLayer.size() - 1; ++i)
     {
-        float delta = targetVals[i] - outputLayer[i].getOutputVal();
-        m_error += delta * delta;
+        m_error += pow(targetVals[i] - outputLayer[i].getOutputVal(), 2);
     }
-    m_error = m_error / 2;
+    m_error /= outputLayer.size() - 1; // Mean
+    m_error /= 2; // Simplify the derivative
 
     // Root mean squared error
     // m_error = 0.0;
     // for (unsigned i = 0; i < outputLayer.size() - 1; ++i)
     // {
-    //     float delta = targetVals[i] - outputLayer[i].getOutputVal();
-    //     m_error += delta * delta;
+    //     m_error += pow(targetVals[i] - outputLayer[i].getOutputVal(), 2);
     // }
-    // m_error /= outputLayer.size() - 1;
-    // m_error = sqrt(m_error);
+    // m_error /= outputLayer.size() - 1; // Mean
+    // m_error /= 2; // Ease the derivative
+    // m_error = sqrt(m_error); // Root
 
     // Cross entropy loss
     // for(unsigned i = 0; i < outputLayer.size() - 1; ++i)
@@ -85,38 +85,33 @@ void Net::backProp(const vector<float> &targetVals)
     for (unsigned i = 0; i < outputLayer.size() - 1; ++i) // -1 to skip the bias
     {
         outputLayer[i].calcOutputGradients(targetVals[i]);
-        outputLayer[i].addToAvgBatchGradient();
     }
 
     //gradients on hidden layers
-    for (unsigned layerNum = m_layers.size() - 2; layerNum > 0 ; --layerNum)
+    for (unsigned layerNum = m_layers.size() - 2; layerNum > 0; --layerNum)
     {
         Layer &hiddenLayer = m_layers[layerNum];
         Layer &nextLayer = m_layers[layerNum + 1];
 
-        for (unsigned i = 0; i < hiddenLayer.size(); ++i)
+        for (unsigned i = 0; i < hiddenLayer.size() - 1; ++i)
         {
             hiddenLayer[i].calcHiddenGradients(nextLayer);
-            hiddenLayer[i].addToAvgBatchGradient();
         }
-        
     }
-
 }
 
 void Net::updateWeights()
 {
-    //for all layers from outputs to first hidden layer update connection weights
+    //for all layers from outputs to first hidden layer: update weights
     for (unsigned layerNum = m_layers.size() - 1; layerNum > 0; --layerNum)
     {
         Layer &layer = m_layers[layerNum];
         Layer &prevLayer = m_layers[layerNum - 1];
 
-        for (unsigned i = 0; i < layer.size() - 1; ++i)
+        for (unsigned neuron_i = 0; neuron_i < layer.size() - 1; ++neuron_i) // Ignore bias...
         {
-            layer[i].updateInputWeights(prevLayer);
+            layer[neuron_i].updateInputWeights(prevLayer);
         }
-        
     }
 }
 
@@ -145,16 +140,16 @@ void Net::feedForward(const vector<float> &inputVals)
     }
 };
 
-void Net::setAvgGradient(unsigned int batchSize)
+void Net::calcAvgGradient(unsigned int batchSize)
 {
     for (unsigned layerNum = m_layers.size() - 1; layerNum > 0 ; --layerNum)
     // for (unsigned layerNum = 1; layerNum < m_layers.size(); ++layerNum)
     {
         Layer &actLayer = m_layers[layerNum];
 
-        for (unsigned i = 0; i < actLayer.size(); ++i)
+        for (unsigned i = 0; i < actLayer.size() - 1; ++i)
         {
-            actLayer[i].setAvgGradient(batchSize);
+            actLayer[i].calcAvgGradient(batchSize);
         }
     }
 }
@@ -165,7 +160,7 @@ void Net::resetGradientSum(){
     {
         Layer &actLayer = m_layers[layerNum];
 
-        for (unsigned i = 0; i < actLayer.size(); ++i)
+        for (unsigned i = 0; i < actLayer.size() - 1; ++i)
         {
             actLayer[i].resetGradientSum();
         }
