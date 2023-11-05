@@ -24,12 +24,13 @@ private:
     static float transferFunctionDerivative(float x);
     static float heWeightInit(unsigned numLayerInputs);
     float sumDOW(const Layer &nextLayer) const;
-    float m_potential;
-    float m_outVal;
-    vector<Connection> m_outWeights;
-    unsigned m_myIndex;
+    float m_potential; // Inner neuron potential
+    float m_outVal; // Output value of the neuron after activation function
+    vector<float> m_outWeights; // A weight float for each neuron in the next layer
+    vector<float> m_outWeightsDeltas; // Previous weight change for each weight - for momentum
+    vector<float> m_outWeightsGradients;
+    unsigned m_myIndex; // Index of this neuron in the layer
     float m_gradient;
-    float m_gradient_sum{0};
 
 public:
     Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neuronIndex);
@@ -38,7 +39,8 @@ public:
     void feedForward(const Layer &prevLayer);
     void calcOutputGradients(float targetVal);
     void calcHiddenGradients(const Layer &nextLayer);
-    void updateInputWeights(Layer &prevLayer);
+    void calcWeightGradients(const Layer &nextLayer);
+    void updateWeights();
     void calcAvgGradient(unsigned int batchSize);
     void resetGradientSum();
 

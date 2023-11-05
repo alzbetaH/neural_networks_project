@@ -103,21 +103,21 @@ int main(int argc, char *argv[]){
 
     // TODO can we select the task using arguments, too? Or would that be too much?
 
-    // InputData trainingInputs("./data/xor_inputs.csv", 1.0);
+    // InputData trainingInputs("./data/xor_inputs.csv", 1.0, batchSize);
     // LabelData trainingLabels("./data/xor_labels.csv", 1, true);
     // InputData testingInputs = trainingInputs;
 
-    // InputData trainingInputs("./data/xor_inputs.csv", 1.0);
+    // InputData trainingInputs("./data/xor_inputs.csv", 1.0, batchSize);
     // LabelData trainingLabels("./data/and_or_labels.csv", 2, true);
     // InputData testingInputs = trainingInputs;
 
-    InputData trainingInputs("./data/iris_inputs.csv", 10.0);
-    LabelData trainingLabels("./data/iris_labels.csv", 3, false);
-    InputData testingInputs = trainingInputs;
+    // InputData trainingInputs("./data/iris_inputs.csv", 10.0, batchSize);
+    // LabelData trainingLabels("./data/iris_labels.csv", 3, false);
+    // InputData testingInputs = trainingInputs;
 
-    // InputData trainingInputs("./data/fashion_mnist_train_vectors.csv", 255.0);
-    // LabelData trainingLabels("./data/fashion_mnist_train_labels.csv", 10, false);
-    // InputData testingInputs("./data/fashion_mnist_test_vectors.csv", 255.0);
+    InputData trainingInputs("./data/fashion_mnist_train_vectors.csv", 255.0, batchSize);
+    LabelData trainingLabels("./data/fashion_mnist_train_labels.csv", 10, false);
+    InputData testingInputs("./data/fashion_mnist_test_vectors.csv", 255.0, batchSize);
 
     vector<float> input, label, output;
 
@@ -137,14 +137,13 @@ int main(int argc, char *argv[]){
         {
             cout << "--------------------------------------------------" << endl;
             cout << "Batch " << batch + 1 << endl;
-            trainingInputs.getBatch(batchSize);
-            actual_batch_size = trainingInputs.getActualBatchSize();
+            actual_batch_size = trainingInputs.getNextBatchSize();
             myNet.resetGradientSum();
 
             for (unsigned i = 0; i < actual_batch_size; i++)
             {
                 cout << "Epoch : Batch : Sample -> " << epoch + 1 << " : " << batch + 1 << " : " << i + 1 << endl;
-                input = trainingInputs.getNextInBatch(batchSize);
+                input = trainingInputs.getNext();
                 label = trainingLabels.getNext();
 
                 // showVectorVals(": Inputs:", input);

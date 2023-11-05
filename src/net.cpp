@@ -98,19 +98,29 @@ void Net::backProp(const vector<float> &targetVals)
             hiddenLayer[i].calcHiddenGradients(nextLayer);
         }
     }
+
+    // Gradients with respect to the weights
+    for (unsigned layerNum = 0; layerNum < m_layers.size() - 1; ++layerNum)
+    {
+        Layer &layer = m_layers[layerNum];
+        Layer &hiddenLayer = m_layers[layerNum + 1];
+
+        for (unsigned i = 0; i < layer.size() - 1; ++i)
+        {
+            layer[i].calcWeightGradients(hiddenLayer);
+        }
+    }
 }
 
 void Net::updateWeights()
 {
-    //for all layers from outputs to first hidden layer: update weights
-    for (unsigned layerNum = m_layers.size() - 1; layerNum > 0; --layerNum)
+    for (unsigned layerNum = 0; layerNum < m_layers.size() - 1; ++layerNum)
     {
-        Layer &layer = m_layers[layerNum];
-        Layer &prevLayer = m_layers[layerNum - 1];
+        Layer &actLayer = m_layers[layerNum];
 
-        for (unsigned neuron_i = 0; neuron_i < layer.size() - 1; ++neuron_i) // Ignore bias...
+        for (unsigned i = 0; i < actLayer.size(); ++i)
         {
-            layer[neuron_i].updateInputWeights(prevLayer);
+            actLayer[i].updateWeights();
         }
     }
 }
@@ -126,8 +136,6 @@ void Net::feedForward(const vector<float> &inputVals)
     {
         m_layers[0][i].setOutputVal(inputVals[i]);
     }
-    
-    //cout << "out: " << m_layers[0][0].getOutputVal() << endl;
 
     //forward propagation
     for (unsigned layerNum = 1; layerNum < m_layers.size(); ++layerNum)
@@ -142,12 +150,11 @@ void Net::feedForward(const vector<float> &inputVals)
 
 void Net::calcAvgGradient(unsigned int batchSize)
 {
-    for (unsigned layerNum = m_layers.size() - 1; layerNum > 0 ; --layerNum)
-    // for (unsigned layerNum = 1; layerNum < m_layers.size(); ++layerNum)
+    for (unsigned layerNum = 0; layerNum < m_layers.size() - 1; ++layerNum)
     {
         Layer &actLayer = m_layers[layerNum];
 
-        for (unsigned i = 0; i < actLayer.size() - 1; ++i)
+        for (unsigned i = 0; i < actLayer.size(); ++i)
         {
             actLayer[i].calcAvgGradient(batchSize);
         }
@@ -155,12 +162,11 @@ void Net::calcAvgGradient(unsigned int batchSize)
 }
 
 void Net::resetGradientSum(){
-    for (unsigned layerNum = m_layers.size() - 1; layerNum > 0 ; --layerNum)
-    // for (unsigned layerNum = 1; layerNum < m_layers.size(); ++layerNum)
+    for (unsigned layerNum = 0; layerNum < m_layers.size() - 1; ++layerNum)
     {
         Layer &actLayer = m_layers[layerNum];
 
-        for (unsigned i = 0; i < actLayer.size() - 1; ++i)
+        for (unsigned i = 0; i < actLayer.size(); ++i)
         {
             actLayer[i].resetGradientSum();
         }

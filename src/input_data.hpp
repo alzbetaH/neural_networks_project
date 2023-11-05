@@ -12,14 +12,12 @@ using namespace std;
 class InputData
 {
 public:
-    InputData(const string filepath, const float divisor);
+    InputData(const string filepath, const float divisor, unsigned batchSize);
 
     void readData();
     void shuffleData(unsigned seed);
     vector<float> &getNext();
-    void getBatch(int batch_size); // TODO?
-    vector<float> &getNextInBatch(unsigned batch_size);
-    int getActualBatchSize();
+    unsigned getNextBatchSize();
 
     inline unsigned length() { return m_data.size(); }
 
@@ -30,6 +28,7 @@ private:
     unsigned m_actIndex;
     unsigned m_batchIndex;
     unsigned m_act_batch_size;
+    const unsigned m_batchSize;
     vector<vector<float>> m_data;
     vector<vector<float>> m_batch;
 };

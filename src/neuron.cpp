@@ -7,8 +7,9 @@ Neuron::Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neur
 {
     for (unsigned c = 0; c < numNeuronOutputs; ++c)
     {
-        m_outWeights.push_back(Connection());
-        m_outWeights.back().weight = heWeightInit(numLayerInputs);
+        m_outWeights.push_back(heWeightInit(numLayerInputs));
+        m_outWeightsDeltas.push_back(0.0);
+        m_outWeightsGradients.push_back(0.0);
     }
     m_myIndex = neuronIndex;
 }
@@ -23,21 +24,19 @@ float Neuron::heWeightInit(unsigned numLayerInputs) {
     return dis(gen);
 }
 
-void Neuron::updateInputWeights(Layer &prevLayer)
+void Neuron::updateWeights()
 {
-    // For all inputs - neurons of the prevoius layer, including bias
-    for (unsigned i = 0; i < prevLayer.size(); ++i)
+    for (unsigned i = 0; i < m_outWeights.size(); ++i)
     {
-        Neuron &input_neuron = prevLayer[i];
-        float oldDeltaWeight = input_neuron.m_outWeights[m_myIndex].deltaweight;
+        float oldDeltaWeight = m_outWeightsDeltas[i];
 
         // - (Learning rate * prev neuron output * gradient) + momentum * old weight change
         float newDeltaWeight =
-            -(eta * input_neuron.getOutputVal() * m_gradient) + alpha * oldDeltaWeight;
+            -(eta * m_outWeightsGradients[i]) + alpha * oldDeltaWeight;
         // cout << "using gradient " << m_gradient << endl;
 
-        input_neuron.m_outWeights[m_myIndex].deltaweight = newDeltaWeight;
-        input_neuron.m_outWeights[m_myIndex].weight += newDeltaWeight;
+        m_outWeightsDeltas[i] = newDeltaWeight;
+        m_outWeights[i] += newDeltaWeight;
     }
 }
 
@@ -50,8 +49,8 @@ float Neuron::sumDOW(const Layer &nextLayer) const
 
     for (unsigned i = 0; i < nextLayer.size() - 1; ++i)
     {
-        sum += m_outWeights[i].weight * nextLayer[i].m_gradient;
-        //sum += m_outWeights[i].weight * nextLayer[i].m_gradient * Neuron::transferFunctionDerivative(nextLayer[i].m_potential);
+        sum += m_outWeights[i] * nextLayer[i].m_gradient;
+        //sum += m_outWeights[i] * nextLayer[i].m_gradient * Neuron::transferFunctionDerivative(nextLayer[i].m_potential);
     }
     
     return sum;
@@ -63,7 +62,6 @@ void Neuron::calcHiddenGradients(const Layer &nextLayer)
      * @brief m_gradient = transfer_function_derivative(inner_potential or output_value) * (sum_for_neurons_r_in_next_layer) (weight_from_this_neuron_to_r * gradient_of_r)
      */
     m_gradient = sumDOW(nextLayer) * Neuron::transferFunctionDerivative(m_outVal);
-    m_gradient_sum += m_gradient;
 }
 
 void Neuron::calcOutputGradients(float targetVal)
@@ -73,7 +71,15 @@ void Neuron::calcOutputGradients(float targetVal)
      */
     m_gradient = (m_outVal - targetVal) * Neuron::transferFunctionDerivative(m_outVal); // for sigmoid or tanh, use the output value
     // m_gradient = (m_outVal - targetVal) * Neuron::transferFunctionDerivative(m_potential); // for relu, use the inner potential? Doesn't really work
-    m_gradient_sum += m_gradient;
+}
+
+void Neuron::calcWeightGradients(const Layer &nextLayer)
+{
+    for(unsigned i = 0; i < m_outWeights.size(); ++i)
+    {
+        // m_outWeightsGradients[i] = m_gradient * nextLayer[i].getOutputVal();
+        m_outWeightsGradients[i] += nextLayer[i].m_gradient * m_outVal;
+    }
 }
 
 float Neuron::transferFunction(float x)
@@ -95,7 +101,7 @@ void Neuron::feedForward(const Layer &prevLayer)
     m_potential = 0.0;
     for (unsigned i = 0; i < prevLayer.size(); ++i)
     {
-        m_potential += prevLayer[i].getOutputVal() * prevLayer[i].m_outWeights[m_myIndex].weight;
+        m_potential += prevLayer[i].getOutputVal() * prevLayer[i].m_outWeights[m_myIndex];
     }
 
     m_outVal = Neuron::transferFunction(m_potential);
@@ -108,10 +114,15 @@ void Neuron::setLearningRate(float learningRate)
 
 void Neuron::calcAvgGradient(unsigned int batchSize)
 {
-    m_gradient = m_gradient_sum / batchSize;
-    // cout << "avg " << m_gradient << endl;
+    for(unsigned i = 0; i < m_outWeightsGradients.size(); ++i)
+    {
+        m_outWeightsGradients[i] /= batchSize;
+    }
 }
 
 void Neuron::resetGradientSum(){
-    m_gradient_sum = 0;
+    for(unsigned i = 0; i < m_outWeightsGradients.size(); ++i)
+    {
+        m_outWeightsGradients[i] = 0.0;
+    }
 }

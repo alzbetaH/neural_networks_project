@@ -1,10 +1,11 @@
 #include "input_data.hpp"
 
-InputData::InputData(const string filepath, const float divisor) :
+InputData::InputData(const string filepath, const float divisor, const unsigned batchSize) :
         m_filepath{filepath},
         m_divisor{divisor},
         m_actIndex{0},
-        m_batchIndex{0}
+        m_batchIndex{0},
+        m_batchSize{batchSize}
 {
     this->readData();
 }
@@ -42,43 +43,6 @@ void InputData::shuffleData(unsigned seed)
     shuffle(m_data.begin(), m_data.end(), default_random_engine(seed));
 }
 
-void InputData::getBatch(int batch_size)
-{
-    /**
-     * @brief Prepare a new batch - vector of input samples. A batch can be
-     * smaller than the batch_size if the end of data is reached
-     */
-    m_batch.clear();
-    for (int i = 0; i < batch_size; ++i)
-    {
-        m_batch.push_back(m_data[m_actIndex + i]);
-
-        if (m_actIndex + i + 1 == m_data.size())
-        {
-            break;
-        }
-    }
-    m_act_batch_size = m_batch.size();
-}
-
-vector<float> &InputData::getNextInBatch(unsigned batch_size)
-{
-    m_actIndex++;
-    if(m_actIndex == m_data.size())
-    {
-        m_actIndex = 0;
-    }
-
-    int batch_idx_to_ret = m_batchIndex;
-    m_batchIndex++;
-    if((m_batchIndex == batch_size) || (m_actIndex == 0))
-    {
-        m_batchIndex = 0;
-    }
-
-    return m_batch[batch_idx_to_ret];
-}
-
 vector<float> &InputData::getNext()
 {
     int idx_to_ret = m_actIndex;
@@ -91,7 +55,11 @@ vector<float> &InputData::getNext()
     return m_data[idx_to_ret];
 }
 
-int InputData::getActualBatchSize()
+unsigned InputData::getNextBatchSize()
 {
-    return m_act_batch_size;
+    /**
+     * @brief Returns the batch size of the next batch - desired batch size if
+     * possible, otherwise the number of remaining samples
+     */
+    return min(m_batchSize, static_cast<unsigned>(m_data.size() - m_actIndex));
 }
