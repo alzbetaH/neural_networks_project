@@ -23,7 +23,7 @@ iris: network
 
 
 mnist: network
-	./network -e 2 -b 1 -l 0.01 784 256 64 10
+	./network -e 2 -b 1 -l 0.005 784 256 64 10
 	python3 evaluator/evaluate.py ./test_labels.csv ./data/fashion_mnist_test_labels.csv
 
 
