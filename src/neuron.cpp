@@ -50,9 +50,8 @@ float Neuron::sumDOW(const Layer &nextLayer) const
     for (unsigned i = 0; i < nextLayer.size() - 1; ++i)
     {
         sum += m_outWeights[i] * nextLayer[i].m_gradient;
-        //sum += m_outWeights[i] * nextLayer[i].m_gradient * Neuron::transferFunctionDerivative(nextLayer[i].m_potential);
+        // sum += m_outWeights[i] * nextLayer[i].m_gradient * Neuron::transferFunctionDerivative(nextLayer[i].m_potential);
     }
-    
     return sum;
 }
 
@@ -61,7 +60,8 @@ void Neuron::calcHiddenGradients(const Layer &nextLayer)
     /**
      * @brief m_gradient = transfer_function_derivative(inner_potential or output_value) * (sum_for_neurons_r_in_next_layer) (weight_from_this_neuron_to_r * gradient_of_r)
      */
-    m_gradient = sumDOW(nextLayer) * Neuron::transferFunctionDerivative(m_outVal);
+    // m_gradient = sumDOW(nextLayer) * Neuron::transferFunctionDerivative(m_outVal);
+    m_gradient = sumDOW(nextLayer) * Neuron::transferFunctionDerivative(m_potential);
 }
 
 void Neuron::calcOutputGradients(float targetVal)
@@ -84,16 +84,16 @@ void Neuron::calcWeightGradients(const Layer &nextLayer)
 
 float Neuron::transferFunction(float x)
 {
-    return tanh(x);
+    // return tanh(x);
 
-    // return max(0.0f, x); // ReLU !Doesn't work
+    return max(0.0f, x); // ReLU !Doesn't work
 }
 
 float Neuron::transferFunctionDerivative(float x)
 {
-    return 1.0 - x * x; // approximate derivative of tanh
+    // return 1.0 - x * x; // approximate derivative of tanh
 
-    // return x < 0.0f ? 0.0f : 1.0f; // ReLU !Doesn't work
+    return x < 0.0f ? 0.0f : 1.0f; // ReLU !Doesn't work
 }
 
 void Neuron::feedForward(const Layer &prevLayer)

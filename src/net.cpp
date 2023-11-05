@@ -48,7 +48,7 @@ void Net::backProp(const vector<float> &targetVals)
         m_error += pow(targetVals[i] - outputLayer[i].getOutputVal(), 2);
     }
     m_error /= outputLayer.size() - 1; // Mean
-    m_error /= 2; // Simplify the derivative
+    // m_error /= 2; // Simplify the derivative
 
     // Root mean squared error
     // m_error = 0.0;
