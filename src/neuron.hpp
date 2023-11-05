@@ -26,7 +26,7 @@ private:
     float sumDOW(const Layer &nextLayer) const;
     float m_potential; // Inner neuron potential
     float m_outVal; // Output value of the neuron after activation function
-    vector<float> m_outWeights; // A weight float for each neuron in the next layer
+    vector<float> m_outWeights; // A weight float for each neuron in the next layer // TODO make private
     vector<float> m_outWeightsDeltas; // Previous weight change for each weight - for momentum
     vector<float> m_outWeightsGradients;
     unsigned m_myIndex; // Index of this neuron in the layer
@@ -34,9 +34,11 @@ private:
 
 public:
     Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neuronIndex);
-    void setOutputVal(float val) { m_outVal = val;}
+    float getPotential() { return m_potential; }
+    void setOutputVal(float val) { m_outVal = val; }
     float getOutputVal(void) const { return m_outVal; }
-    void feedForward(const Layer &prevLayer);
+    void calcPotential(const Layer &prevLayer);
+    void calcOutput();
     void calcOutputGradients(float targetVal);
     void calcHiddenGradients(const Layer &nextLayer);
     void calcWeightGradients(const Layer &nextLayer);

@@ -50,7 +50,6 @@ float Neuron::sumDOW(const Layer &nextLayer) const
     for (unsigned i = 0; i < nextLayer.size() - 1; ++i)
     {
         sum += m_outWeights[i] * nextLayer[i].m_gradient;
-        // sum += m_outWeights[i] * nextLayer[i].m_gradient * Neuron::transferFunctionDerivative(nextLayer[i].m_potential);
     }
     return sum;
 }
@@ -60,8 +59,8 @@ void Neuron::calcHiddenGradients(const Layer &nextLayer)
     /**
      * @brief m_gradient = transfer_function_derivative(inner_potential or output_value) * (sum_for_neurons_r_in_next_layer) (weight_from_this_neuron_to_r * gradient_of_r)
      */
-    // m_gradient = sumDOW(nextLayer) * Neuron::transferFunctionDerivative(m_outVal);
-    m_gradient = sumDOW(nextLayer) * Neuron::transferFunctionDerivative(m_potential);
+    // m_gradient = sumDOW(nextLayer) * Neuron::transferFunctionDerivative(m_outVal); // For tanh or sigmoid, use the output value
+    m_gradient = sumDOW(nextLayer) * Neuron::transferFunctionDerivative(m_potential); // For relu, use the inner potential
 }
 
 void Neuron::calcOutputGradients(float targetVal)
@@ -69,8 +68,8 @@ void Neuron::calcOutputGradients(float targetVal)
     /**
      * @brief m_gradient = transfer_function_derivative(inner_potential or output_value) * (target_value - output_value)
      */
-    m_gradient = (m_outVal - targetVal) * Neuron::transferFunctionDerivative(m_outVal); // for sigmoid or tanh, use the output value
-    // m_gradient = (m_outVal - targetVal) * Neuron::transferFunctionDerivative(m_potential); // for relu, use the inner potential? Doesn't really work
+    // m_gradient = (m_outVal - targetVal) * Neuron::transferFunctionDerivative(m_outVal);
+    m_gradient = m_outVal - targetVal; // For softmax
 }
 
 void Neuron::calcWeightGradients(const Layer &nextLayer)
@@ -96,14 +95,17 @@ float Neuron::transferFunctionDerivative(float x)
     return x < 0.0f ? 0.0f : 1.0f; // ReLU !Doesn't work
 }
 
-void Neuron::feedForward(const Layer &prevLayer)
+void Neuron::calcPotential(const Layer &prevLayer)
 {
     m_potential = 0.0;
     for (unsigned i = 0; i < prevLayer.size(); ++i)
     {
         m_potential += prevLayer[i].getOutputVal() * prevLayer[i].m_outWeights[m_myIndex];
     }
+}
 
+void Neuron::calcOutput()
+{
     m_outVal = Neuron::transferFunction(m_potential);
 }
 

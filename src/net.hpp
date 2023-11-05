@@ -1,6 +1,7 @@
 #include <vector>
 #include <cstdlib>
 #include <iostream>
+#include <cmath>
 #include "neuron.hpp"
 
 using namespace std;

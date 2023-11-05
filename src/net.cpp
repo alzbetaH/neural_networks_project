@@ -42,12 +42,12 @@ void Net::backProp(const vector<float> &targetVals)
     Layer &outputLayer = m_layers.back();
 
     // Mean squared error
-    m_error = 0.0;
-    for (unsigned i = 0; i < outputLayer.size() - 1; ++i)
-    {
-        m_error += pow(targetVals[i] - outputLayer[i].getOutputVal(), 2);
-    }
-    m_error /= outputLayer.size() - 1; // Mean
+    // m_error = 0.0;
+    // for (unsigned i = 0; i < outputLayer.size() - 1; ++i)
+    // {
+    //     m_error += pow(targetVals[i] - outputLayer[i].getOutputVal(), 2);
+    // }
+    // m_error /= outputLayer.size() - 1; // Mean
     // m_error /= 2; // Simplify the derivative
 
     // Root mean squared error
@@ -70,12 +70,12 @@ void Net::backProp(const vector<float> &targetVals)
     // }
 
     // Categorical cross entropy loss
-    // m_error = 0;
-    // for(unsigned i = 0; i < outputLayer.size(); ++i)
-    // {
-    //     double outputVal = max(numeric_limits<float>::min(), outputLayer[i].getOutputVal()); // Avoid log(0)
-    //     m_error -= targetVals[i] * log(outputVal);
-    // }
+    m_error = 0;
+    for(unsigned i = 0; i < outputLayer.size() - 1; ++i) // exclude bias
+    {
+        float outputVal = max(outputLayer[i].getOutputVal(), 0.000001f); // Avoid log(0)
+        m_error -= targetVals[i] * log(outputVal);
+    }
 
     m_recentAverageError =
         (m_recentAverageError * m_recentAverageSmoothingFactor + m_error)
@@ -131,20 +131,35 @@ void Net::feedForward(const vector<float> &inputVals)
     // -1 because of bias
     assert(inputVals.size() == m_layers[0].size() - 1);
 
-    //set values of input neurons
+    // Set values of input neurons
     for (unsigned i = 0; i < inputVals.size(); ++i)
     {
         m_layers[0][i].setOutputVal(inputVals[i]);
     }
 
-    //forward propagation
-    for (unsigned layerNum = 1; layerNum < m_layers.size(); ++layerNum)
+    // Calculate output values of hidden neurons
+    for (unsigned layerNum = 1; layerNum < m_layers.size() - 1; ++layerNum)
     {
         Layer &prevLayer = m_layers[layerNum -1];
         for (unsigned i = 0; i < m_layers[layerNum].size() - 1; ++i)
         {
-            m_layers[layerNum][i].feedForward(prevLayer);
+            m_layers[layerNum][i].calcPotential(prevLayer);
+            m_layers[layerNum][i].calcOutput();
         }
+    }
+
+    // Calculate the network outputs - use softmax
+    Layer &outLayer = m_layers[m_layers.size() - 1];
+    Layer &prevLayer = m_layers[m_layers.size() - 2];
+    double exp_sum = 0.0;
+    for (unsigned i = 0; i < outLayer.size() - 1; ++i)
+    {
+        outLayer[i].calcPotential(prevLayer);
+        exp_sum += exp(outLayer[i].getPotential());
+    }
+    for (unsigned i = 0; i < outLayer.size() - 1; ++i)
+    {
+        outLayer[i].setOutputVal(exp(outLayer[i].getPotential()) / exp_sum);
     }
 };
 
