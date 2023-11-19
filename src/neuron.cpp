@@ -1,7 +1,7 @@
 #include "neuron.hpp"
 
 float Neuron::eta = 0.15;
-float Neuron::alpha = 0.5;
+float Neuron::alpha = 0.9;
 
 Neuron::Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neuronIndex)
 {

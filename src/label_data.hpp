@@ -16,10 +16,16 @@ public:
     LabelData(const string filepath, unsigned categories, bool onehot_encoded);
 
     void readData();
+    void splitData(float percentage);
     vector<float> onehotEncode(unsigned label);
     unsigned onehotDecode(const std::vector<float>& encoded);
     void shuffleData(unsigned seed);
     vector<float> &getNext();
+    vector<float> &getNextValid();
+    vector<float> &getNextTrain();
+    vector<vector<float>> m_data;
+    vector<vector<float>> m_trainingData;
+    vector<vector<float>> m_validationData;
     // vector<vector<float>> getBatch(); // TODO?
 
     inline unsigned length() { return m_data.size(); }
@@ -30,5 +36,9 @@ private:
     const bool m_onehot_encoded;
 
     unsigned m_actIndex;
-    vector<vector<float>> m_data;
+    unsigned m_actIndexTrain;
+    unsigned m_actIndexValid;
+    // vector<vector<float>> m_data;
+    // vector<vector<float>> m_trainingData;
+    // vector<vector<float>> m_validationData;
 };

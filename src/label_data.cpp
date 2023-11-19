@@ -4,7 +4,9 @@ LabelData::LabelData(const string filepath, unsigned categories, bool onehot_enc
         m_filepath{filepath},
         m_categories{categories},
         m_onehot_encoded{onehot_encoded},
-        m_actIndex{0}
+        m_actIndex{0},
+        m_actIndexTrain{0},
+        m_actIndexValid{0}
 {
     this->readData();
 }
@@ -49,6 +51,15 @@ void LabelData::readData()
     file.close();
 }
 
+void LabelData::splitData(float percentage)
+{
+    const size_t splitIndex = static_cast<size_t>(percentage * m_data.size());
+
+    // Split the data into training and validation sets
+    m_trainingData.assign(m_data.begin(), m_data.begin() + splitIndex);
+    m_validationData.assign(m_data.begin() + splitIndex, m_data.end());
+}
+
 vector<float> LabelData::onehotEncode(unsigned label)
 {
     if (label >= m_categories) {
@@ -79,7 +90,7 @@ unsigned LabelData::onehotDecode(const std::vector<float>& encoded) {
 
 void LabelData::shuffleData(unsigned seed)
 {
-    shuffle(m_data.begin(), m_data.end(), default_random_engine(seed));
+    shuffle(m_trainingData.begin(), m_trainingData.end(), default_random_engine(seed));
 }
 
 vector<float> &LabelData::getNext()
@@ -92,4 +103,28 @@ vector<float> &LabelData::getNext()
     }
 
     return m_data[idx_to_ret];
+}
+
+vector<float> &LabelData::getNextTrain()
+{
+    int idx_to_ret = m_actIndexTrain;
+    m_actIndexTrain++;
+    if(m_actIndexTrain == m_trainingData.size())
+    {
+        m_actIndexTrain = 0;
+    }
+
+    return m_trainingData[idx_to_ret];
+}
+
+vector<float> &LabelData::getNextValid()
+{
+    int idx_to_ret = m_actIndexValid;
+    m_actIndexValid++;
+    if(m_actIndexValid == m_validationData.size())
+    {
+        m_actIndexValid = 0;
+    }
+
+    return m_validationData[idx_to_ret];
 }

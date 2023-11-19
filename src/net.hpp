@@ -1,6 +1,7 @@
 #include <vector>
 #include <cstdlib>
 #include <iostream>
+#include <algorithm>
 #include <cmath>
 #include "neuron.hpp"
 
@@ -24,4 +25,6 @@ public:
     float getError(void) const {return m_error;};
     void calcAvgGradient(unsigned int batchSize);
     void resetGradientSum();
+    float getLoss(const vector<float> &targetVals);
+    int compare_result(const vector<float> &output, const vector<float> &label);
 };

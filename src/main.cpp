@@ -118,8 +118,22 @@ int main(int argc, char *argv[]){
     InputData trainingInputs("./data/fashion_mnist_train_vectors.csv", 255.0, batchSize);
     LabelData trainingLabels("./data/fashion_mnist_train_labels.csv", 10, false);
     InputData testingInputs("./data/fashion_mnist_test_vectors.csv", 255.0, batchSize);
+    LabelData testingLabels("./data/fashion_mnist_test_labels.csv", 10, false);
+
+    // split into training and validation data
+    trainingInputs.splitData(0.8);
+    trainingLabels.splitData(0.8);
+
+    string accuracy_file_path = "accuracy.csv";
+    ofstream file_acc(accuracy_file_path);
+    if(!file_acc.is_open())
+    {
+        throw runtime_error("Unable to open file: " + accuracy_file_path);
+    }
 
     vector<float> input, label, output;
+    vector<float> input_v, label_v, output_v;
+    vector<float> input_t, label_t, output_t;
 
     unsigned actual_batch_size;
     // TODO if batch size > size of dataset, batch size = size of dataset
@@ -133,18 +147,18 @@ int main(int argc, char *argv[]){
         trainingInputs.shuffleData(seed);
         trainingLabels.shuffleData(seed);
 
-        for(unsigned batch = 0; batch < ceil(trainingInputs.length() / batchSize); ++batch)
+        for(unsigned batch = 0; batch < ceil(trainingInputs.m_trainingData.size() / batchSize); ++batch)
         {
-            cout << "--------------------------------------------------" << endl;
-            cout << "Batch " << batch + 1 << endl;
+            // cout << "--------------------------------------------------" << endl;
+            // cout << "Batch " << batch + 1 << endl;
             actual_batch_size = trainingInputs.getNextBatchSize();
             myNet.resetGradientSum();
 
             for (unsigned i = 0; i < actual_batch_size; i++)
             {
-                cout << "Epoch : Batch : Sample -> " << epoch + 1 << " : " << batch + 1 << " : " << i + 1 << endl;
-                input = trainingInputs.getNext();
-                label = trainingLabels.getNext();
+                // cout << "Epoch : Batch : Sample -> " << epoch + 1 << " : " << batch + 1 << " : " << i + 1 << endl;
+                input = trainingInputs.getNextTrain();
+                label = trainingLabels.getNextTrain();
 
                 // showVectorVals(": Inputs:", input);
                 myNet.feedForward(input);
@@ -152,21 +166,59 @@ int main(int argc, char *argv[]){
                 myNet.getResults(output);
                 //cout << "out: " << m_layers.back()[batch].getOutputVal() << endl;
                 //cout << "res val: " << output[0] << endl;
-                showVectorVals("Outputs:", output);
+                // showVectorVals("Outputs:", output);
 
-                showVectorVals("Labels:", label);
+                // showVectorVals("Labels:", label);
                 assert(label.size() == topology.back());
             
                 myNet.backProp(label);
 
-                cout << "Loss: " << myNet.getError() << endl;
-                cout << "Avg loss: " << myNet.getRecentAverageError() << endl;
+                // cout << "Loss: " << myNet.getError() << endl;
+                // cout << "Avg loss: " << myNet.getRecentAverageError() << endl;
             }
             myNet.calcAvgGradient(actual_batch_size);
             myNet.updateWeights();
         }
-    }
 
+        // counting validation loss and accuracy
+        float accuracy_sum_v = 0;
+        float avg_loss_v = 0;
+        for(unsigned j = 0; j < trainingInputs.m_validationData.size(); ++j)
+        {
+            input_v = trainingInputs.getNextValid();
+            label_v = trainingLabels.getNextValid();
+            myNet.feedForward(input_v);
+            myNet.getResults(output_v);
+            if (myNet.compare_result(output_v, label_v))
+            {
+                accuracy_sum_v++;
+            }
+            avg_loss_v += myNet.getLoss(label_v);
+        }
+        cout << "Validation Loss: " << avg_loss_v / trainingInputs.m_validationData.size() << endl;
+        cout << "Validation Accuracy: " << accuracy_sum_v / trainingInputs.m_validationData.size() << endl;
+        file_acc << "validation;" << epoch + 1 << ";" <<  accuracy_sum_v / trainingInputs.m_validationData.size() << endl;
+        
+        // counting train loss and accuracy
+        float accuracy_sum_t = 0;
+        float avg_loss_t = 0;
+        for(unsigned j = 0; j < trainingInputs.m_trainingData.size(); ++j)
+        {
+            input_t = trainingInputs.getNextTrain();
+            label_t = trainingLabels.getNextTrain();
+            myNet.feedForward(input_t);
+            myNet.getResults(output_t);
+            if (myNet.compare_result(output_t, label_t))
+            {
+                accuracy_sum_t++;
+            }
+            avg_loss_t += myNet.getLoss(label_t);
+        }
+        cout << "Train Loss: " << avg_loss_t / trainingInputs.m_trainingData.size() << endl;
+        cout << "Train Accuracy: " << accuracy_sum_t / trainingInputs.m_trainingData.size() << endl;
+        file_acc << "train;" << epoch + 1 << ";" <<  accuracy_sum_t / trainingInputs.m_trainingData.size() << endl;
+    }
+    cout << "----------------------------------" << endl;
     cout << "Done training, begin testing" << endl;
 
     string test_labels_filepath = "test_labels.csv";
@@ -175,17 +227,26 @@ int main(int argc, char *argv[]){
     {
         throw runtime_error("Unable to open file: " + test_labels_filepath);
     }
+
+    float accuracy_sum_test = 0;
     for(unsigned i = 0; i < testingInputs.length(); ++i)
     {
         input = testingInputs.getNext();
+        label = testingLabels.getNext();
         myNet.feedForward(input);
         myNet.getResults(output);
 
         // Get the index of the maximum value in the output vector
         auto maxElementIter = max_element(output.begin(), output.end());
         unsigned index = distance(output.begin(), maxElementIter);
+
+        if (myNet.compare_result(output, label))
+        {
+            accuracy_sum_test++;
+        }
+        
         file << index << endl;
     }
-
+    cout << "accuracy_test:" << accuracy_sum_test / testingLabels.length() << endl;
     cout << "Done testing" << endl;
 }

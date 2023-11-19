@@ -37,6 +37,18 @@ void Net::getResults(vector<float> &resultVals) const
     
 }
 
+float Net::getLoss(const vector<float> &targetVals)
+{
+    Layer &outputLayer = m_layers.back();
+    float loss = 0;
+    for(unsigned i = 0; i < outputLayer.size() - 1; ++i) // exclude bias
+    {
+        float outputVal = max(outputLayer[i].getOutputVal(), (float)(1.0E-15F)); // Avoid log(0)
+        loss -= targetVals[i] * log(outputVal);
+    }   
+    return loss;
+}
+
 void Net::backProp(const vector<float> &targetVals)
 {
     Layer &outputLayer = m_layers.back();
@@ -186,4 +198,15 @@ void Net::resetGradientSum(){
             actLayer[i].resetGradientSum();
         }
     }
+}
+
+int Net::compare_result(const vector<float> &output, const vector<float> &label)
+{
+    auto maxElementIter = max_element(output.begin(), output.end());
+    unsigned index_o = distance(output.begin(), maxElementIter);
+
+    auto maxElementIter_l = max_element(label.begin(), label.end());
+    unsigned index_l = distance(label.begin(), maxElementIter_l);
+
+    return (index_o == index_l);
 }
