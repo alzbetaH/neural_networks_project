@@ -12,26 +12,26 @@ using namespace std;
 class InputData
 {
 public:
-    InputData(const string filepath, const float divisor, unsigned batchSize);
+    InputData(const string filepath, const double divisor, unsigned batchSize);
 
     void readData();
-    void splitData(float percentage);
+    void splitData(double percentage);
     void shuffleData(unsigned seed);
-    vector<float> &getNext();
+    vector<double> &getNext();
     unsigned getNextBatchSize();
-    vector<float> &getNextTrain();
-    vector<float> &getNextValid();
+    vector<double> &getNextTrain();
+    vector<double> &getNextValid();
 
 
     inline unsigned length() { return m_data.size(); }
-    vector<vector<float>> m_data;
-    vector<vector<float>> m_trainingData;
-    vector<vector<float>> m_validationData;
+    vector<vector<double>> m_data;
+    vector<vector<double>> m_trainingData;
+    vector<vector<double>> m_validationData;
 
 
 private:
     const string m_filepath;
-    const float m_divisor; // To normalize the data, divide it by this number when reading
+    const double m_divisor; // To normalize the data, divide it by this number when reading
 
     unsigned m_actIndex;
     unsigned m_actIndexTrain;
@@ -40,9 +40,9 @@ private:
     unsigned m_act_batch_size;
     const unsigned m_batchSize;
     
-    // vector<vector<float>> m_data;
-    // vector<vector<float>> m_trainingData;
-    // vector<vector<float>> m_validationData;
+    // vector<vector<double>> m_data;
+    // vector<vector<double>> m_trainingData;
+    // vector<vector<double>> m_validationData;
 
-    vector<vector<float>> m_batch;
+    vector<vector<double>> m_batch;
 };

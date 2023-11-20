@@ -1,6 +1,6 @@
 #include "input_data.hpp"
 
-InputData::InputData(const string filepath, const float divisor, const unsigned batchSize) :
+InputData::InputData(const string filepath, const double divisor, const unsigned batchSize) :
         m_filepath{filepath},
         m_divisor{divisor},
         m_actIndex{0},
@@ -21,7 +21,7 @@ void InputData::readData()
     }
 
     string tmp_line;
-    vector<float> tmp_data;
+    vector<double> tmp_data;
     while(getline(file, tmp_line))
     {
         tmp_data.clear();
@@ -40,7 +40,7 @@ void InputData::readData()
 
 }
 
-void InputData::splitData(float percentage)
+void InputData::splitData(double percentage)
 {
     const size_t splitIndex = static_cast<size_t>(percentage * m_data.size());
 
@@ -54,7 +54,7 @@ void InputData::shuffleData(unsigned seed)
     shuffle(m_trainingData.begin(), m_trainingData.end(), default_random_engine(seed));
 }
 
-vector<float> &InputData::getNext()
+vector<double> &InputData::getNext()
 {
     int idx_to_ret = m_actIndex;
     m_actIndex++;
@@ -66,7 +66,7 @@ vector<float> &InputData::getNext()
     return m_data[idx_to_ret];
 }
 
-vector<float> &InputData::getNextTrain()
+vector<double> &InputData::getNextTrain()
 {
     int idx_to_ret = m_actIndexTrain;
     m_actIndexTrain++;
@@ -78,7 +78,7 @@ vector<float> &InputData::getNextTrain()
     return m_trainingData[idx_to_ret];
 }
 
-vector<float> &InputData::getNextValid()
+vector<double> &InputData::getNextValid()
 {
     int idx_to_ret = m_actIndexValid;
     m_actIndexValid++;

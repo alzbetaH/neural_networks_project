@@ -3,7 +3,7 @@
 #include <limits>
 #include <string>
 
-float Net::m_recentAverageSmoothingFactor = 100.0;
+double Net::m_recentAverageSmoothingFactor = 100.0;
 
 Net::Net(const vector<unsigned> &topology) : m_error(0.0), m_recentAverageError(0.0)
 {
@@ -26,7 +26,7 @@ Net::Net(const vector<unsigned> &topology) : m_error(0.0), m_recentAverageError(
     }
 }
 
-void Net::getResults(vector<float> &resultVals) const 
+void Net::getResults(vector<double> &resultVals) const 
 {
     resultVals.clear();
 
@@ -38,19 +38,19 @@ void Net::getResults(vector<float> &resultVals) const
     
 }
 
-float Net::getLoss(const vector<float> &targetVals)
+double Net::getLoss(const vector<double> &targetVals)
 {
     Layer &outputLayer = m_layers.back();
-    float loss = 0;
+    double loss = 0;
     for(unsigned i = 0; i < outputLayer.size() - 1; ++i) // exclude bias
     {
-        float outputVal = max(outputLayer[i].getOutputVal(), (float)(1.0E-15F)); // Avoid log(0)
+        double outputVal = max(outputLayer[i].getOutputVal(), (double)(1.0E-15F)); // Avoid log(0)
         loss -= targetVals[i] * log(outputVal);
     }   
-    return loss;
+    return abs(loss) < 1e-14 ? 0.0 : loss;
 }
 
-void Net::backProp(const vector<float> &targetVals)
+void Net::backProp(const vector<double> &targetVals)
 {
     Layer &outputLayer = m_layers.back();
 
@@ -86,7 +86,7 @@ void Net::backProp(const vector<float> &targetVals)
     m_error = 0;
     for(unsigned i = 0; i < outputLayer.size() - 1; ++i) // exclude bias
     {
-        float outputVal = max(outputLayer[i].getOutputVal(), 0.000001f); // Avoid log(0)
+        double outputVal = max(outputLayer[i].getOutputVal(), 0.000001); // Avoid log(0)
         m_error -= targetVals[i] * log(outputVal);
     }
 
@@ -138,7 +138,7 @@ void Net::updateWeights()
     }
 }
 
-void Net::feedForward(const vector<float> &inputVals)
+void Net::feedForward(const vector<double> &inputVals)
 {
     //the number of input values is the same as the number of input neurons
     // -1 because of bias
@@ -164,27 +164,27 @@ void Net::feedForward(const vector<float> &inputVals)
     // Calculate the network outputs - use softmax
     Layer &outLayer = m_layers[m_layers.size() - 1];
     Layer &prevLayer = m_layers[m_layers.size() - 2];
-    float exp_sum = 0.0;
-    float val = 0.0;
+    double exp_sum = 0.0;
+    double val = 0.0;
     for (unsigned i = 0; i < outLayer.size() - 1; ++i)
     {
         outLayer[i].calcPotential(prevLayer);
         val = exp(outLayer[i].getPotential());
-        exp_sum += isfinite(val) ? val : 0.0;
-        // if (exp_sum == 0)
-        // {
-        //     for (unsigned k = 0; k < outLayer.size() - 1; ++k)
-        //     {
-        //         if (to_string(outLayer[k].getPotential()) == "-nan")
-        //         {
-        //             cout << "naaaaaaaan " << endl;
-        //         }
-        //         cout << "output string " << to_string(outLayer[k].getPotential()) << endl;
-        //         cout << "output potential " << outLayer[k].getPotential() << endl;
-        //         cout << "output exp " << exp(outLayer[k].getPotential()) << endl;
-        //     }
-        //     exit(0);
-        // }
+        exp_sum += val;
+        if (exp_sum == 0)
+        {
+            for (unsigned k = 0; k < outLayer.size() - 1; ++k)
+            {
+                if (to_string(outLayer[k].getPotential()) == "-nan")
+                {
+                    cout << "naaaaaaaan " << endl;
+                }
+                cout << "output string " << to_string(outLayer[k].getPotential()) << endl;
+                cout << "output potential " << outLayer[k].getPotential() << endl;
+                cout << "output exp " << exp(outLayer[k].getPotential()) << endl;
+            }
+            exit(0);
+        }
     
     }
 
@@ -220,7 +220,7 @@ void Net::resetGradientSum(){
     }
 }
 
-int Net::compare_result(const vector<float> &output, const vector<float> &label)
+int Net::compare_result(const vector<double> &output, const vector<double> &label)
 {
     auto maxElementIter = max_element(output.begin(), output.end());
     unsigned index_o = distance(output.begin(), maxElementIter);

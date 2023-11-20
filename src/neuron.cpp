@@ -1,7 +1,7 @@
 #include "neuron.hpp"
 
-float Neuron::eta = 0.15;
-float Neuron::alpha = 0.9;
+double Neuron::eta = 0.15;
+double Neuron::alpha = 0.9;
 
 Neuron::Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neuronIndex)
 {
@@ -14,7 +14,7 @@ Neuron::Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neur
     m_myIndex = neuronIndex;
 }
 
-float Neuron::heWeightInit(unsigned numLayerInputs) {
+double Neuron::heWeightInit(unsigned numLayerInputs) {
     /**
      * @brief He weight initialization
      */
@@ -28,24 +28,33 @@ void Neuron::updateWeights()
 {
     for (unsigned i = 0; i < m_outWeights.size(); ++i)
     {
-        float oldDeltaWeight = m_outWeightsDeltas[i];
+        double oldDeltaWeight = m_outWeightsDeltas[i];
 
         // - (Learning rate * prev neuron output * gradient) + momentum * old weight change
-        float newDeltaWeight =
+        double newDeltaWeight =
             -(eta * m_outWeightsGradients[i]) + alpha * oldDeltaWeight;
-        // cout << "using gradient " << m_gradient << endl;
-
+        // outWeightsGratients -> nans
+        // if (to_string(newDeltaWeight) == "-nan")
+        // {
+        //     for (unsigned i = 0; i < m_outWeights.size(); ++i)
+        //     {
+        //         cout << "out_weight: "<< m_outWeightsGradients[i] << " old delta: " << oldDeltaWeight << endl;
+        //     }
+            
+        //     exit(0);
+        // }
+        newDeltaWeight = abs(newDeltaWeight) < 1e-14 ? 0.0 : newDeltaWeight;
         m_outWeightsDeltas[i] = newDeltaWeight;
         m_outWeights[i] += newDeltaWeight;
     }
 }
 
-float Neuron::sumDOW(const Layer &nextLayer) const
+double Neuron::sumDOW(const Layer &nextLayer) const
 {
     /**
      * @brief Sum of derivatives of weights
      */
-    float sum = 0.0;
+    double sum = 0.0;
 
     for (unsigned i = 0; i < nextLayer.size() - 1; ++i)
     {
@@ -78,18 +87,17 @@ void Neuron::calcHiddenGradients(const Layer &nextLayer)
     
 }
 
-void Neuron::calcOutputGradients(float targetVal)
+void Neuron::calcOutputGradients(double targetVal)
 {
     /**
      * @brief m_gradient = transfer_function_derivative(inner_potential or output_value) * (target_value - output_value)
      */
     // m_gradient = (m_outVal - targetVal) * Neuron::transferFunctionDerivative(m_outVal);
     m_gradient = m_outVal - targetVal; // For softmax
-    if (to_string(m_gradient) == "-nan")
-    {
-        cout << "outVal "<< m_outVal << " targetval " << targetVal << endl;
-        exit(0);
-    }
+    // if (to_string(m_gradient) == "-nan")
+    // {
+    //     cout << "outVal "<< m_outVal << " targetval " << targetVal << endl;
+    // }
 }
 
 void Neuron::calcWeightGradients(const Layer &nextLayer)
@@ -110,14 +118,18 @@ void Neuron::calcWeightGradients(const Layer &nextLayer)
     
 }
 
-float Neuron::transferFunction(float x)
+double Neuron::transferFunction(double x)
 {
     // return tanh(x);
-
-    return max(0.0f, x); // ReLU !Doesn't work
+    // if (to_string(x) == "-nan")
+    // {
+    //     cout << "x = "<< x << endl;
+    //     exit(0);
+    // }
+    return max(0.0, x); // ReLU !Doesn't work
 }
 
-float Neuron::transferFunctionDerivative(float x)
+double Neuron::transferFunctionDerivative(double x)
 {
     // return 1.0 - x * x; // approximate derivative of tanh
 
@@ -131,7 +143,7 @@ void Neuron::calcPotential(const Layer &prevLayer)
     {
         m_potential += prevLayer[i].getOutputVal() * prevLayer[i].m_outWeights[m_myIndex];
     }
-    m_potential = isfinite(m_potential) ? m_potential : 0.0;
+    m_potential = abs(m_potential) < 1e-14 ? 0.0 : m_potential;
     // if (to_string(m_potential) == "-nan")
     // {
     //     cout << "nan by calculatin potential" << endl;
@@ -148,7 +160,7 @@ void Neuron::calcOutput()
     m_outVal = Neuron::transferFunction(m_potential);
 }
 
-void Neuron::setLearningRate(float learningRate)
+void Neuron::setLearningRate(double learningRate)
 {
     eta = learningRate;
 }

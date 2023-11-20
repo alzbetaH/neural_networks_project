@@ -30,7 +30,7 @@ vector<unsigned int> parseTopology(int number_of_layers, char* neurons_per_layer
     return numbers;
 }
 
-void showVectorVals(string label, vector<float> &v)
+void showVectorVals(string label, vector<double> &v)
 {
     cout << label << " ";
     for (unsigned i = 0; i < v.size(); i++)
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]){
     bool epochsSet = false;
     unsigned batchSize = 1;
     bool batchSizeSet = false;
-    float learningRate = 0.01;
+    double learningRate = 0.01;
     bool learningRateSet = false;
 
     struct option long_options[] = {
@@ -133,9 +133,9 @@ int main(int argc, char *argv[]){
         throw runtime_error("Unable to open file: " + accuracy_file_path);
     }
 
-    vector<float> input, label, output;
-    vector<float> input_v, label_v, output_v;
-    vector<float> input_t, label_t, output_t;
+    vector<double> input, label, output;
+    vector<double> input_v, label_v, output_v;
+    vector<double> input_t, label_t, output_t;
 
     unsigned actual_batch_size;
     // TODO if batch size > size of dataset, batch size = size of dataset
@@ -183,8 +183,8 @@ int main(int argc, char *argv[]){
         }
 
         // counting validation loss and accuracy
-        float accuracy_sum_v = 0;
-        float avg_loss_v = 0;
+        double accuracy_sum_v = 0;
+        double avg_loss_v = 0;
         for(unsigned j = 0; j < trainingInputs.m_validationData.size(); ++j)
         {
             input_v = trainingInputs.getNextValid();
@@ -203,8 +203,8 @@ int main(int argc, char *argv[]){
         file_acc << "validation;" << epoch + 1 << ";" <<  accuracy_sum_v / trainingInputs.m_validationData.size() << endl;
         
         // counting train loss and accuracy
-        float accuracy_sum_t = 0;
-        float avg_loss_t = 0;
+        double accuracy_sum_t = 0;
+        double avg_loss_t = 0;
         for(unsigned j = 0; j < trainingInputs.m_trainingData.size(); ++j)
         {
             input_t = trainingInputs.getNextTrain();
@@ -231,7 +231,7 @@ int main(int argc, char *argv[]){
         throw runtime_error("Unable to open file: " + test_labels_filepath);
     }
 
-    float accuracy_sum_test = 0;
+    double accuracy_sum_test = 0;
     for(unsigned i = 0; i < testingInputs.length(); ++i)
     {
         input = testingInputs.getNext();

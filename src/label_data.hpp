@@ -16,17 +16,17 @@ public:
     LabelData(const string filepath, unsigned categories, bool onehot_encoded);
 
     void readData();
-    void splitData(float percentage);
-    vector<float> onehotEncode(unsigned label);
-    unsigned onehotDecode(const std::vector<float>& encoded);
+    void splitData(double percentage);
+    vector<double> onehotEncode(unsigned label);
+    unsigned onehotDecode(const std::vector<double>& encoded);
     void shuffleData(unsigned seed);
-    vector<float> &getNext();
-    vector<float> &getNextValid();
-    vector<float> &getNextTrain();
-    vector<vector<float>> m_data;
-    vector<vector<float>> m_trainingData;
-    vector<vector<float>> m_validationData;
-    // vector<vector<float>> getBatch(); // TODO?
+    vector<double> &getNext();
+    vector<double> &getNextValid();
+    vector<double> &getNextTrain();
+    vector<vector<double>> m_data;
+    vector<vector<double>> m_trainingData;
+    vector<vector<double>> m_validationData;
+    // vector<vector<double>> getBatch(); // TODO?
 
     inline unsigned length() { return m_data.size(); }
 
@@ -38,7 +38,7 @@ private:
     unsigned m_actIndex;
     unsigned m_actIndexTrain;
     unsigned m_actIndexValid;
-    // vector<vector<float>> m_data;
-    // vector<vector<float>> m_trainingData;
-    // vector<vector<float>> m_validationData;
+    // vector<vector<double>> m_data;
+    // vector<vector<double>> m_trainingData;
+    // vector<vector<double>> m_validationData;
 };

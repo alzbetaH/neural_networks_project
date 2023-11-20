@@ -20,7 +20,7 @@ void LabelData::readData()
     }
 
     string tmp_line;
-    vector<float> tmp_data;
+    vector<double> tmp_data;
     while(getline(file, tmp_line))
     {
         tmp_data.clear();
@@ -43,7 +43,7 @@ void LabelData::readData()
         else // If the labels are integers (category numbers)
         {
             unsigned label = stof(tmp_line);
-            vector<float> label_onehot = this->onehotEncode(label);
+            vector<double> label_onehot = this->onehotEncode(label);
             m_data.push_back(label_onehot);
         }
     }
@@ -51,7 +51,7 @@ void LabelData::readData()
     file.close();
 }
 
-void LabelData::splitData(float percentage)
+void LabelData::splitData(double percentage)
 {
     const size_t splitIndex = static_cast<size_t>(percentage * m_data.size());
 
@@ -60,18 +60,18 @@ void LabelData::splitData(float percentage)
     m_validationData.assign(m_data.begin() + splitIndex, m_data.end());
 }
 
-vector<float> LabelData::onehotEncode(unsigned label)
+vector<double> LabelData::onehotEncode(unsigned label)
 {
     if (label >= m_categories) {
         throw std::out_of_range("Cannot one-hot encode label" + to_string(label));
     }
 
-    vector<float> encoded(m_categories, 0.0);
+    vector<double> encoded(m_categories, 0.0);
     encoded[label] = 1;
     return encoded;
 }
 
-unsigned LabelData::onehotDecode(const std::vector<float>& encoded) {
+unsigned LabelData::onehotDecode(const std::vector<double>& encoded) {
     if (encoded.size() != m_categories) {
         throw std::runtime_error("Invalid one-hot encoded vector size");
     }
@@ -93,7 +93,7 @@ void LabelData::shuffleData(unsigned seed)
     shuffle(m_trainingData.begin(), m_trainingData.end(), default_random_engine(seed));
 }
 
-vector<float> &LabelData::getNext()
+vector<double> &LabelData::getNext()
 {
     int idx_to_ret = m_actIndex;
     m_actIndex++;
@@ -105,7 +105,7 @@ vector<float> &LabelData::getNext()
     return m_data[idx_to_ret];
 }
 
-vector<float> &LabelData::getNextTrain()
+vector<double> &LabelData::getNextTrain()
 {
     int idx_to_ret = m_actIndexTrain;
     m_actIndexTrain++;
@@ -117,7 +117,7 @@ vector<float> &LabelData::getNextTrain()
     return m_trainingData[idx_to_ret];
 }
 
-vector<float> &LabelData::getNextValid()
+vector<double> &LabelData::getNextValid()
 {
     int idx_to_ret = m_actIndexValid;
     m_actIndexValid++;
