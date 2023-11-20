@@ -2,6 +2,7 @@
 #include <cmath>
 #include <getopt.h>
 #include <algorithm> // TODO can we use that?
+#include <cfenv>
 
 #include "main.hpp"
 
@@ -44,6 +45,7 @@ void usage(){
 }
 
 int main(int argc, char *argv[]){
+    // feenableexcept(FE_ALL_EXCEPT);
     unsigned epochs = 1;
     bool epochsSet = false;
     unsigned batchSize = 1;
@@ -195,6 +197,7 @@ int main(int argc, char *argv[]){
             }
             avg_loss_v += myNet.getLoss(label_v);
         }
+        showVectorVals("Outputs:", output_v);
         cout << "Validation Loss: " << avg_loss_v / trainingInputs.m_validationData.size() << endl;
         cout << "Validation Accuracy: " << accuracy_sum_v / trainingInputs.m_validationData.size() << endl;
         file_acc << "validation;" << epoch + 1 << ";" <<  accuracy_sum_v / trainingInputs.m_validationData.size() << endl;

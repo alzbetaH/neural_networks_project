@@ -1,6 +1,7 @@
 #include "net.hpp"
 #include <cassert>
 #include <limits>
+#include <string>
 
 float Net::m_recentAverageSmoothingFactor = 100.0;
 
@@ -163,12 +164,31 @@ void Net::feedForward(const vector<float> &inputVals)
     // Calculate the network outputs - use softmax
     Layer &outLayer = m_layers[m_layers.size() - 1];
     Layer &prevLayer = m_layers[m_layers.size() - 2];
-    double exp_sum = 0.0;
+    float exp_sum = 0.0;
+    float val = 0.0;
     for (unsigned i = 0; i < outLayer.size() - 1; ++i)
     {
         outLayer[i].calcPotential(prevLayer);
-        exp_sum += exp(outLayer[i].getPotential());
+        val = exp(outLayer[i].getPotential());
+        exp_sum += isfinite(val) ? val : 0.0;
+        // if (exp_sum == 0)
+        // {
+        //     for (unsigned k = 0; k < outLayer.size() - 1; ++k)
+        //     {
+        //         if (to_string(outLayer[k].getPotential()) == "-nan")
+        //         {
+        //             cout << "naaaaaaaan " << endl;
+        //         }
+        //         cout << "output string " << to_string(outLayer[k].getPotential()) << endl;
+        //         cout << "output potential " << outLayer[k].getPotential() << endl;
+        //         cout << "output exp " << exp(outLayer[k].getPotential()) << endl;
+        //     }
+        //     exit(0);
+        // }
+    
     }
+
+    
     for (unsigned i = 0; i < outLayer.size() - 1; ++i)
     {
         outLayer[i].setOutputVal(exp(outLayer[i].getPotential()) / exp_sum);
