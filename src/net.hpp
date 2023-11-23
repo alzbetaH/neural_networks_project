@@ -26,5 +26,7 @@ public:
     void calcAvgGradient(unsigned int batchSize);
     void resetGradientSum();
     double getLoss(const vector<double> &targetVals);
+    double validationAccuracy();
     int compare_result(const vector<double> &output, const vector<double> &label);
+    void setTraining(int is_training, unsigned int layer_num, double dropout);
 };

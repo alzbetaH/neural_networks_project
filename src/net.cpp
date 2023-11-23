@@ -171,20 +171,20 @@ void Net::feedForward(const vector<double> &inputVals)
         outLayer[i].calcPotential(prevLayer);
         val = exp(outLayer[i].getPotential());
         exp_sum += val;
-        if (exp_sum == 0)
-        {
-            for (unsigned k = 0; k < outLayer.size() - 1; ++k)
-            {
-                if (to_string(outLayer[k].getPotential()) == "-nan")
-                {
-                    cout << "naaaaaaaan " << endl;
-                }
-                cout << "output string " << to_string(outLayer[k].getPotential()) << endl;
-                cout << "output potential " << outLayer[k].getPotential() << endl;
-                cout << "output exp " << exp(outLayer[k].getPotential()) << endl;
-            }
-            exit(0);
-        }
+        // if (exp_sum == 0)
+        // {
+        //     for (unsigned k = 0; k < outLayer.size() - 1; ++k)
+        //     {
+        //         if (to_string(outLayer[k].getPotential()) == "-nan")
+        //         {
+        //             cout << "naaaaaaaan " << endl;
+        //         }
+        //         cout << "output string " << to_string(outLayer[k].getPotential()) << endl;
+        //         cout << "output potential " << outLayer[k].getPotential() << endl;
+        //         cout << "output exp " << exp(outLayer[k].getPotential()) << endl;
+        //     }
+        //     exit(0);
+        // }
     
     }
 
@@ -229,4 +229,17 @@ int Net::compare_result(const vector<double> &output, const vector<double> &labe
     unsigned index_l = distance(label.begin(), maxElementIter_l);
 
     return (index_o == index_l);
+}
+
+void Net::setTraining(int is_training, unsigned int layer_num, double dropout)
+{
+    Layer &actLayer = m_layers[layer_num];
+    for (unsigned i = 0; i < actLayer.size(); ++i)
+    {
+        double random_value = rand() / static_cast<double>(RAND_MAX);
+        if (is_training && (random_value > (1 - dropout)))
+        {
+            actLayer[i].applyDropout();
+        }
+    }
 }

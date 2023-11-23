@@ -23,8 +23,8 @@ iris: network
 
 
 mnist: network
-	./network -e 40 -b 32 -l 0.01 784 32 16 10
-	python3 evaluator/evaluate.py ./test_labels.csv ./data/fashion_mnist_test_labels.csv
+	./network -e 35 -b 32 -l 0.001 784 64 16 10
+#	python3 evaluator/evaluate.py ./test_labels.csv ./data/fashion_mnist_test_labels.csv
 
 
 run: network xor

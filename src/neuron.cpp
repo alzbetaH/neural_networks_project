@@ -2,6 +2,8 @@
 
 double Neuron::eta = 0.15;
 double Neuron::alpha = 0.9;
+double Neuron::decay = 0.9;
+double Neuron::epsilon = 1e-8;
 
 Neuron::Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neuronIndex)
 {
@@ -12,6 +14,7 @@ Neuron::Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neur
         m_outWeightsGradients.push_back(0.0);
     }
     m_myIndex = neuronIndex;
+    apply_dropout = 0;
 }
 
 double Neuron::heWeightInit(unsigned numLayerInputs) {
@@ -24,28 +27,47 @@ double Neuron::heWeightInit(unsigned numLayerInputs) {
     return dis(gen);
 }
 
+void Neuron::applyDropout()
+{
+    apply_dropout = 1;
+}
+
+// void Neuron::updateWeights()
+// {
+//     for (unsigned i = 0; i < m_outWeights.size(); ++i)
+//     {
+//         double oldDeltaWeight = m_outWeightsDeltas[i];
+
+//         // - (Learning rate * prev neuron output * gradient) + momentum * old weight change
+//         double newDeltaWeight =
+//             -(eta * m_outWeightsGradients[i]) + alpha * oldDeltaWeight;
+//         // outWeightsGratients -> nans
+//         // if (to_string(newDeltaWeight) == "-nan")
+//         // {
+//         //     for (unsigned i = 0; i < m_outWeights.size(); ++i)
+//         //     {
+//         //         cout << "out_weight: "<< m_outWeightsGradients[i] << " old delta: " << oldDeltaWeight << endl;
+//         //     }
+            
+//         //     exit(0);
+//         // }
+//         newDeltaWeight = abs(newDeltaWeight) < 1e-14 ? 0.0 : newDeltaWeight;
+//         m_outWeightsDeltas[i] = newDeltaWeight;
+//         m_outWeights[i] += newDeltaWeight;
+//     }
+// }
+
+// RMSprop, learning rate set to 0.001
 void Neuron::updateWeights()
 {
     for (unsigned i = 0; i < m_outWeights.size(); ++i)
     {
-        double oldDeltaWeight = m_outWeightsDeltas[i];
+        
+        double gradient = m_outWeightsGradients[i];
 
-        // - (Learning rate * prev neuron output * gradient) + momentum * old weight change
-        double newDeltaWeight =
-            -(eta * m_outWeightsGradients[i]) + alpha * oldDeltaWeight;
-        // outWeightsGratients -> nans
-        // if (to_string(newDeltaWeight) == "-nan")
-        // {
-        //     for (unsigned i = 0; i < m_outWeights.size(); ++i)
-        //     {
-        //         cout << "out_weight: "<< m_outWeightsGradients[i] << " old delta: " << oldDeltaWeight << endl;
-        //     }
-            
-        //     exit(0);
-        // }
-        newDeltaWeight = abs(newDeltaWeight) < 1e-14 ? 0.0 : newDeltaWeight;
-        m_outWeightsDeltas[i] = newDeltaWeight;
-        m_outWeights[i] += newDeltaWeight;
+        m_outWeightsDeltas[i] = decay * m_outWeightsDeltas[i] + (1 - decay) * gradient * gradient;
+
+        m_outWeights[i] += -(eta / (sqrt(m_outWeightsDeltas[i]) + epsilon)) * gradient;
     }
 }
 
@@ -94,6 +116,10 @@ void Neuron::calcOutputGradients(double targetVal)
      */
     // m_gradient = (m_outVal - targetVal) * Neuron::transferFunctionDerivative(m_outVal);
     m_gradient = m_outVal - targetVal; // For softmax
+    // if (to_string(m_gradient) == "-nan")
+    // {
+    //     cout << "outVal "<< m_outVal << " targetval " << targetVal << endl;
+    // }
     // if (to_string(m_gradient) == "-nan")
     // {
     //     cout << "outVal "<< m_outVal << " targetval " << targetVal << endl;
@@ -157,7 +183,7 @@ void Neuron::calcPotential(const Layer &prevLayer)
 
 void Neuron::calcOutput()
 {
-    m_outVal = Neuron::transferFunction(m_potential);
+    m_outVal = Neuron::apply_dropout ? 0.0 : Neuron::transferFunction(m_potential);
 }
 
 void Neuron::setLearningRate(double learningRate)

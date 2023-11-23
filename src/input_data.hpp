@@ -24,10 +24,8 @@ public:
 
 
     inline unsigned length() { return m_data.size(); }
-    vector<vector<double>> m_data;
-    vector<vector<double>> m_trainingData;
-    vector<vector<double>> m_validationData;
-
+    inline unsigned validLength() { return m_validationData.size(); };
+    inline unsigned trainLength() { return m_trainingData.size(); }
 
 private:
     const string m_filepath;
@@ -40,9 +38,9 @@ private:
     unsigned m_act_batch_size;
     const unsigned m_batchSize;
     
-    // vector<vector<double>> m_data;
-    // vector<vector<double>> m_trainingData;
-    // vector<vector<double>> m_validationData;
+    vector<vector<double>> m_data;
+    vector<vector<double>> m_trainingData;
+    vector<vector<double>> m_validationData;
 
     vector<vector<double>> m_batch;
 };

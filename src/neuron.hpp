@@ -20,6 +20,8 @@ class Neuron
 private:
     static double eta; //[0.0...1.0] overrall learning rate
     static double alpha; //[0.0...n] multiplier of last weight change (momentum) 
+    static double decay;
+    static double epsilon;
     static double transferFunction(double x);
     static double transferFunctionDerivative(double x);
     static double heWeightInit(unsigned numLayerInputs);
@@ -31,9 +33,12 @@ private:
     vector<double> m_outWeightsGradients;
     unsigned m_myIndex; // Index of this neuron in the layer
     double m_gradient;
+    int apply_dropout;
+    int is_training;
 
 public:
     Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neuronIndex);
+    void applyDropout();
     double getPotential() { return m_potential; }
     void setOutputVal(double val) { m_outVal = val; }
     double getOutputVal(void) const { return m_outVal; }

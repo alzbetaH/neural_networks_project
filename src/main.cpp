@@ -102,7 +102,6 @@ int main(int argc, char *argv[]){
     Neuron::setLearningRate(learningRate);
 
     Net myNet(topology);
-
     // TODO can we select the task using arguments, too? Or would that be too much?
 
     // InputData trainingInputs("./data/xor_inputs.csv", 1.0, batchSize);
@@ -126,12 +125,12 @@ int main(int argc, char *argv[]){
     trainingInputs.splitData(0.8);
     trainingLabels.splitData(0.8);
 
-    string accuracy_file_path = "accuracy.csv";
-    ofstream file_acc(accuracy_file_path);
-    if(!file_acc.is_open())
-    {
-        throw runtime_error("Unable to open file: " + accuracy_file_path);
-    }
+    // string accuracy_file_path = "accuracy.csv";
+    // ofstream file_acc(accuracy_file_path);
+    // if(!file_acc.is_open())
+    // {
+    //     throw runtime_error("Unable to open file: " + accuracy_file_path);
+    // }
 
     vector<double> input, label, output;
     vector<double> input_v, label_v, output_v;
@@ -148,8 +147,9 @@ int main(int argc, char *argv[]){
         unsigned seed = static_cast<unsigned>(time(nullptr));
         trainingInputs.shuffleData(seed);
         trainingLabels.shuffleData(seed);
-
-        for(unsigned batch = 0; batch < ceil(trainingInputs.m_trainingData.size() / batchSize); ++batch)
+        //set dropout on first layer
+        myNet.setTraining(1, 1, 0.0);
+        for(unsigned batch = 0; batch < ceil(trainingInputs.trainLength() / batchSize); ++batch)
         {
             // cout << "--------------------------------------------------" << endl;
             // cout << "Batch " << batch + 1 << endl;
@@ -171,7 +171,7 @@ int main(int argc, char *argv[]){
                 // showVectorVals("Outputs:", output);
 
                 // showVectorVals("Labels:", label);
-                assert(label.size() == topology.back());
+                // assert(label.size() == topology.back());
             
                 myNet.backProp(label);
 
@@ -185,7 +185,9 @@ int main(int argc, char *argv[]){
         // counting validation loss and accuracy
         double accuracy_sum_v = 0;
         double avg_loss_v = 0;
-        for(unsigned j = 0; j < trainingInputs.m_validationData.size(); ++j)
+        //unset dropout on first layer
+        myNet.setTraining(0, 1, 0.0);
+        for(unsigned j = 0; j < trainingInputs.validLength(); ++j)
         {
             input_v = trainingInputs.getNextValid();
             label_v = trainingLabels.getNextValid();
@@ -198,14 +200,15 @@ int main(int argc, char *argv[]){
             avg_loss_v += myNet.getLoss(label_v);
         }
         showVectorVals("Outputs:", output_v);
-        cout << "Validation Loss: " << avg_loss_v / trainingInputs.m_validationData.size() << endl;
-        cout << "Validation Accuracy: " << accuracy_sum_v / trainingInputs.m_validationData.size() << endl;
-        file_acc << "validation;" << epoch + 1 << ";" <<  accuracy_sum_v / trainingInputs.m_validationData.size() << endl;
+        cout << "Validation Loss: " << avg_loss_v / trainingInputs.validLength() << endl;
+        cout << "Validation Accuracy: " << accuracy_sum_v / trainingInputs.validLength() << endl;
+        //file_acc << "validation;" << epoch + 1 << ";" <<  accuracy_sum_v / trainingInputs.validLength() << endl;
         
         // counting train loss and accuracy
         double accuracy_sum_t = 0;
         double avg_loss_t = 0;
-        for(unsigned j = 0; j < trainingInputs.m_trainingData.size(); ++j)
+        
+        for(unsigned j = 0; j < trainingInputs.trainLength(); ++j)
         {
             input_t = trainingInputs.getNextTrain();
             label_t = trainingLabels.getNextTrain();
@@ -217,19 +220,19 @@ int main(int argc, char *argv[]){
             }
             avg_loss_t += myNet.getLoss(label_t);
         }
-        cout << "Train Loss: " << avg_loss_t / trainingInputs.m_trainingData.size() << endl;
-        cout << "Train Accuracy: " << accuracy_sum_t / trainingInputs.m_trainingData.size() << endl;
-        file_acc << "train;" << epoch + 1 << ";" <<  accuracy_sum_t / trainingInputs.m_trainingData.size() << endl;
+        cout << "Train Loss: " << avg_loss_t / trainingInputs.trainLength() << endl;
+        cout << "Train Accuracy: " << accuracy_sum_t / trainingInputs.trainLength() << endl;
+        //file_acc << "train;" << epoch + 1 << ";" <<  accuracy_sum_t / trainingInputs.trainLength() << endl;
     }
     cout << "----------------------------------" << endl;
     cout << "Done training, begin testing" << endl;
 
-    string test_labels_filepath = "test_labels.csv";
-    ofstream file(test_labels_filepath);
-    if(!file.is_open())
-    {
-        throw runtime_error("Unable to open file: " + test_labels_filepath);
-    }
+    // string test_labels_filepath = "test_labels.csv";
+    // ofstream file(test_labels_filepath);
+    // if(!file.is_open())
+    // {
+    //     throw runtime_error("Unable to open file: " + test_labels_filepath);
+    // }
 
     double accuracy_sum_test = 0;
     for(unsigned i = 0; i < testingInputs.length(); ++i)
@@ -248,7 +251,7 @@ int main(int argc, char *argv[]){
             accuracy_sum_test++;
         }
         
-        file << index << endl;
+        //file << index << endl;
     }
     cout << "accuracy_test:" << accuracy_sum_test / testingLabels.length() << endl;
     cout << "Done testing" << endl;

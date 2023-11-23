@@ -23,12 +23,10 @@ public:
     vector<double> &getNext();
     vector<double> &getNextValid();
     vector<double> &getNextTrain();
-    vector<vector<double>> m_data;
-    vector<vector<double>> m_trainingData;
-    vector<vector<double>> m_validationData;
-    // vector<vector<double>> getBatch(); // TODO?
 
-    inline unsigned length() { return m_data.size(); }
+    inline unsigned length() { return m_data.size(); };
+    inline unsigned validLength() { return m_validationData.size(); };
+    inline unsigned trainLength() { return m_trainingData.size(); }
 
 private:
     const string m_filepath;
@@ -38,7 +36,7 @@ private:
     unsigned m_actIndex;
     unsigned m_actIndexTrain;
     unsigned m_actIndexValid;
-    // vector<vector<double>> m_data;
-    // vector<vector<double>> m_trainingData;
-    // vector<vector<double>> m_validationData;
+    vector<vector<double>> m_data;
+    vector<vector<double>> m_trainingData;
+    vector<vector<double>> m_validationData;
 };
