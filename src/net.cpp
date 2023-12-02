@@ -1,11 +1,14 @@
+/**
+ * @file net.cpp
+ * @brief Implementation of the Net class for a simple neural network.
+ */
+
 #include "net.hpp"
 #include <cassert>
 #include <limits>
 #include <string>
 
-double Net::m_recentAverageSmoothingFactor = 100.0;
-
-Net::Net(const vector<unsigned> &topology, unsigned seed) : m_error(0.0), m_recentAverageError(0.0)
+Net::Net(const vector<unsigned> &topology, unsigned seed) : m_error(0.0)
 {
     unsigned numLayers = topology.size();
 
@@ -21,7 +24,6 @@ Net::Net(const vector<unsigned> &topology, unsigned seed) : m_error(0.0), m_rece
         for (unsigned neuronNum = 0; neuronNum <= topology[layerNum]; ++neuronNum) {
             m_layers.back().push_back(Neuron(topology[layerNum], numOutputs, neuronNum, generator()));
         }
-
         // bias value
         m_layers.back().back().setOutputVal(1.0);
     }
@@ -54,34 +56,6 @@ void Net::backProp(const vector<double> &targetVals)
 {
     Layer &outputLayer = m_layers.back();
 
-    // Mean squared error
-    // m_error = 0.0;
-    // for (unsigned i = 0; i < outputLayer.size() - 1; ++i)
-    // {
-    //     m_error += pow(targetVals[i] - outputLayer[i].getOutputVal(), 2);
-    // }
-    // m_error /= outputLayer.size() - 1; // Mean
-    // m_error /= 2; // Simplify the derivative
-
-    // Root mean squared error
-    // m_error = 0.0;
-    // for (unsigned i = 0; i < outputLayer.size() - 1; ++i)
-    // {
-    //     m_error += pow(targetVals[i] - outputLayer[i].getOutputVal(), 2);
-    // }
-    // m_error /= outputLayer.size() - 1; // Mean
-    // m_error /= 2; // Ease the derivative
-    // m_error = sqrt(m_error); // Root
-
-    // Cross entropy loss
-    // for(unsigned i = 0; i < outputLayer.size() - 1; ++i)
-    // {
-    //     if(targetVals[i] == 1.0)
-    //     {
-    //         m_error = -log(outputLayer[i].getOutputVal());
-    //     }
-    // }
-
     // Categorical cross entropy loss
     m_error = 0;
     for(unsigned i = 0; i < outputLayer.size() - 1; ++i) // exclude bias
@@ -89,10 +63,6 @@ void Net::backProp(const vector<double> &targetVals)
         double outputVal = max(outputLayer[i].getOutputVal(), 0.000001); // Avoid log(0)
         m_error -= targetVals[i] * log(outputVal);
     }
-
-    m_recentAverageError =
-        (m_recentAverageError * m_recentAverageSmoothingFactor + m_error)
-        / (m_recentAverageSmoothingFactor + 1.0);
 
     //gradients for output neurons
     for (unsigned i = 0; i < outputLayer.size() - 1; ++i) // -1 to skip the bias
@@ -171,20 +141,6 @@ void Net::feedForward(const vector<double> &inputVals)
         outLayer[i].calcPotential(prevLayer);
         val = exp(outLayer[i].getPotential());
         exp_sum += val;
-        // if (exp_sum == 0)
-        // {
-        //     for (unsigned k = 0; k < outLayer.size() - 1; ++k)
-        //     {
-        //         if (to_string(outLayer[k].getPotential()) == "-nan")
-        //         {
-        //             cout << "naaaaaaaan " << endl;
-        //         }
-        //         cout << "output string " << to_string(outLayer[k].getPotential()) << endl;
-        //         cout << "output potential " << outLayer[k].getPotential() << endl;
-        //         cout << "output exp " << exp(outLayer[k].getPotential()) << endl;
-        //     }
-        //     exit(0);
-        // }
     }
 
     for (unsigned i = 0; i < outLayer.size() - 1; ++i)
