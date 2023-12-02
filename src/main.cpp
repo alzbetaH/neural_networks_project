@@ -137,18 +137,6 @@ int main(int argc, char *argv[]){
 
     Net myNet(topology, seed);
 
-    // InputData trainingInputs("./data/xor_inputs.csv", 1.0, batchSize);
-    // LabelData trainingLabels("./data/xor_labels.csv", 1, true);
-    // InputData testingInputs = trainingInputs;
-
-    // InputData trainingInputs("./data/xor_inputs.csv", 1.0, batchSize);
-    // LabelData trainingLabels("./data/and_or_labels.csv", 2, true);
-    // InputData testingInputs = trainingInputs;
-
-    // InputData trainingInputs("./data/iris_inputs.csv", 10.0, batchSize);
-    // LabelData trainingLabels("./data/iris_labels.csv", 3, false);
-    // InputData testingInputs = trainingInputs;
-
     InputData trainingInputs("./data/fashion_mnist_train_vectors.csv", 255.0, batchSize);
     LabelData trainingLabels("./data/fashion_mnist_train_labels.csv", 10, false);
     InputData testingInputs("./data/fashion_mnist_test_vectors.csv", 255.0, batchSize);

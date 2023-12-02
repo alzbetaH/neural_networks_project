@@ -12,22 +12,8 @@ network: $(SOURCES)
 	g++ -std=c++17 -Wall -O3 -Ofast $(SOURCES) -o network -g
 
 
-xor: network
-	./network -e 2000 -b 1 -l 0.1 2 2 1
-	python3 evaluator/evaluate.py ./test_labels.csv ./data/xor_labels.csv
-
-
-iris: network
-	./network -e 1000 -b 1 -l 0.01 4 10 3
-	python3 evaluator/evaluate.py ./test_labels.csv ./data/iris_labels.csv
-
-
-mnist: network
-	./network -e 7 -b 32 -l 0.001 784 64 32 10
-
-
 run: mnist
-	@
+	./network -e 7 -b 32 -l 0.001 784 64 32 10
 
 
 pack: clean
