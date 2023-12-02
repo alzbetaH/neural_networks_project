@@ -36,7 +36,6 @@ void Net::getResults(vector<double> &resultVals) const
         //cout << "out: " << m_layers.back()[i].getOutputVal() << endl;
         resultVals.push_back(m_layers.back()[i].getOutputVal());
     }
-    
 }
 
 double Net::getLoss(const vector<double> &targetVals)
@@ -47,7 +46,7 @@ double Net::getLoss(const vector<double> &targetVals)
     {
         double outputVal = max(outputLayer[i].getOutputVal(), (double)(1.0E-15F)); // Avoid log(0)
         loss -= targetVals[i] * log(outputVal);
-    }   
+    }
     return abs(loss) < 1e-14 ? 0.0 : loss;
 }
 
@@ -186,7 +185,6 @@ void Net::feedForward(const vector<double> &inputVals)
         //     }
         //     exit(0);
         // }
-    
     }
 
     for (unsigned i = 0; i < outLayer.size() - 1; ++i)

@@ -23,6 +23,7 @@ public:
     vector<double> &getNextValid();
 
 
+    inline void resetIndex(){ m_actIndex = 0; m_actIndexTrain = 0; m_actIndexValid = 0; m_batchIndex = 0; }
     inline unsigned length() { return m_data.size(); }
     inline unsigned validLength() { return m_validationData.size(); };
     inline unsigned trainLength() { return m_trainingData.size(); }
@@ -37,7 +38,7 @@ private:
     unsigned m_batchIndex;
     unsigned m_act_batch_size;
     const unsigned m_batchSize;
-    
+
     vector<vector<double>> m_data;
     vector<vector<double>> m_trainingData;
     vector<vector<double>> m_validationData;

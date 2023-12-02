@@ -57,7 +57,7 @@ void Neuron::setDropout(double probability)
 //         //     {
 //         //         cout << "out_weight: "<< m_outWeightsGradients[i] << " old delta: " << oldDeltaWeight << endl;
 //         //     }
-            
+
 //         //     exit(0);
 //         // }
 //         newDeltaWeight = abs(newDeltaWeight) < 1e-14 ? 0.0 : newDeltaWeight;
@@ -96,7 +96,7 @@ double Neuron::sumDOW(const Layer &nextLayer) const
     //     {
     //         cout << "weight "<< m_outWeights[i] << " m_gradient " << nextLayer[i].m_gradient << endl;
     //     }
-        
+
     //     exit(0);
     // }
     return sum;
@@ -114,7 +114,6 @@ void Neuron::calcHiddenGradients(const Layer &nextLayer)
     //     cout << "sumDOW "<< sumDOW(nextLayer) << " derivative " << Neuron::transferFunctionDerivative(m_potential) << endl;
     //     exit(0);
     // }
-    
 }
 
 void Neuron::calcOutputGradients(double targetVal)
@@ -149,7 +148,6 @@ void Neuron::calcWeightGradients(const Layer &nextLayer)
     //     }
     //     exit(0);
     // }
-    
 }
 
 double Neuron::transferFunction(double x)

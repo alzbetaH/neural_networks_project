@@ -23,7 +23,6 @@ void TrainingData::getTopology(vector<unsigned> &topology)
         ss >> n;
         topology.push_back(n);
     }
-    
     return;
 }
 
@@ -50,7 +49,6 @@ unsigned TrainingData::getNextInputs(vector<double> &inputVals)
         {
             inputVals.push_back(oneValue);
         }
-        
     }
 
     return inputVals.size();
@@ -73,7 +71,6 @@ unsigned TrainingData::getTargetOutputs(vector<double> &targetOutputVals)
         {
             targetOutputVals.push_back(oneValue);
         }
-        
     }
     return targetOutputVals.size();
 }

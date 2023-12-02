@@ -24,6 +24,7 @@ public:
     vector<double> &getNextValid();
     vector<double> &getNextTrain();
 
+    inline void resetIndex(){ m_actIndex = 0; m_actIndexTrain = 0; m_actIndexValid = 0; }
     inline unsigned length() { return m_data.size(); };
     inline unsigned validLength() { return m_validationData.size(); };
     inline unsigned trainLength() { return m_trainingData.size(); }
