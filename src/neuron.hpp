@@ -28,12 +28,13 @@ private:
     double sumDOW(const Layer &nextLayer) const;
     double m_potential; // Inner neuron potential
     double m_outVal; // Output value of the neuron after activation function
-    vector<double> m_outWeights; // A weight double for each neuron in the next layer // TODO make private
+    vector<double> m_outWeights; // A weight double for each neuron in the next layer
     vector<double> m_outWeightsDeltas; // Previous weight change for each weight - for momentum
     vector<double> m_outWeightsGradients;
     unsigned m_myIndex; // Index of this neuron in the layer
     double m_gradient;
-    int dropout_probability;
+    double dropout_probability; // Probability of neuron being dropped out
+    int dropout_probability_int; // Probability of neuron being dropped out, but in interval from 0 to RAND_MAX (equal to INT_MAX I suppose). For optimization purposes
     int is_training;
 
 public:

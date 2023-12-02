@@ -101,8 +101,9 @@ int main(int argc, char *argv[]){
 
     Neuron::setLearningRate(learningRate);
 
-    // unsigned seed = static_cast<unsigned>(time(nullptr));
-    unsigned seed = 42;
+    // TODO Find a good seed and set it
+    unsigned seed = static_cast<unsigned>(time(nullptr));
+    // unsigned seed = 42;
 
     Net myNet(topology, seed);
 
@@ -151,7 +152,8 @@ int main(int argc, char *argv[]){
 
         // set dropout (hidden layers only)
         myNet.setDropout(1, 0.5);
-        myNet.setDropout(2, 0.2);
+        myNet.setDropout(2, 0.05);
+
         for(unsigned batch = 0; batch < ceil(trainingInputs.trainLength() / batchSize); ++batch)
         {
             // cout << "--------------------------------------------------" << endl;
@@ -189,9 +191,11 @@ int main(int argc, char *argv[]){
         double accuracy_sum_v = 0;
         double avg_loss_v = 0;
 
-        // unset dropout
-        myNet.setDropout(1, 0.0);
-        myNet.setDropout(2, 0.0);
+        // Unset dropout for all layers
+        for(unsigned layerNum = 0; layerNum < topology.size(); ++layerNum)
+        {
+            myNet.setDropout(layerNum, 0.0);
+        }
 
         for(unsigned j = 0; j < trainingInputs.validLength(); ++j)
         {

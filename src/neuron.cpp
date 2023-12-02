@@ -6,6 +6,9 @@ double Neuron::decay = 0.9;
 double Neuron::epsilon = 1e-8;
 
 Neuron::Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neuronIndex, unsigned seed)
+    : m_myIndex{neuronIndex},
+    dropout_probability{0},
+    dropout_probability_int{0}
 {
     std::mt19937 generator(seed); // To generate seeds individual to weights
 
@@ -16,7 +19,6 @@ Neuron::Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neur
         m_outWeightsGradients.push_back(0.0);
     }
     m_myIndex = neuronIndex;
-    dropout_probability = 0;
 }
 
 double Neuron::heWeightInit(unsigned numLayerInputs, unsigned seed) {
@@ -30,7 +32,13 @@ double Neuron::heWeightInit(unsigned numLayerInputs, unsigned seed) {
 
 void Neuron::setDropout(double probability)
 {
+    /**
+     * @brief Set dropout probability for a neuron
+     *
+     * @arg probability - probability of neuron being dropped out, between 0 and 1
+     */
     dropout_probability = probability;
+    dropout_probability_int = static_cast<unsigned>(probability * RAND_MAX);
 }
 
 // void Neuron::updateWeights()
@@ -163,11 +171,6 @@ void Neuron::calcPotential(const Layer &prevLayer)
 {
     m_potential = 0.0;
 
-    // Apply dropout with probability
-    if((rand() / static_cast<float>(RAND_MAX)) < dropout_probability){
-        return;
-    }
-
     for (unsigned i = 0; i < prevLayer.size(); ++i)
     {
         m_potential += prevLayer[i].getOutputVal() * prevLayer[i].m_outWeights[m_myIndex];
@@ -186,7 +189,16 @@ void Neuron::calcPotential(const Layer &prevLayer)
 
 void Neuron::calcOutput()
 {
-    m_outVal = Neuron::transferFunction(m_potential);
+    // Apply dropout with probability
+    if(rand() < dropout_probability_int){
+        m_potential = 0.0;
+        m_outVal = 0.0;
+        return;
+    }else{
+        // Remember to scale the output value by dropout probability
+        // (if probability is 0, nothing happens to the value)
+        m_outVal = Neuron::transferFunction(m_potential) / (1 - dropout_probability);
+    }
 }
 
 void Neuron::setLearningRate(double learningRate)

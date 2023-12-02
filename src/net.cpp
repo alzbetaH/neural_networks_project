@@ -189,7 +189,6 @@ void Net::feedForward(const vector<double> &inputVals)
     
     }
 
-    
     for (unsigned i = 0; i < outLayer.size() - 1; ++i)
     {
         outLayer[i].setOutputVal(exp(outLayer[i].getPotential()) / exp_sum);
