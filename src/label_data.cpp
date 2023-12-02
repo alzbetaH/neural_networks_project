@@ -1,7 +1,12 @@
+/**
+ * @file label_data.cpp
+ * @brief Implementation of the labelData class for a simple neural network.
+ */
+
 #include "label_data.hpp"
 
 LabelData::LabelData(const string filepath, unsigned categories, bool onehot_encoded) :
-        m_filepath{filepath},
+    m_filepath{filepath},
         m_categories{categories},
         m_onehot_encoded{onehot_encoded},
         m_actIndex{0},
@@ -101,7 +106,6 @@ vector<double> &LabelData::getNext()
     {
         m_actIndex = 0;
     }
-
     return m_data[idx_to_ret];
 }
 
@@ -113,7 +117,6 @@ vector<double> &LabelData::getNextTrain()
     {
         m_actIndexTrain = 0;
     }
-
     return m_trainingData[idx_to_ret];
 }
 
@@ -125,6 +128,5 @@ vector<double> &LabelData::getNextValid()
     {
         m_actIndexValid = 0;
     }
-
     return m_validationData[idx_to_ret];
 }

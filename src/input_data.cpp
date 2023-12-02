@@ -1,3 +1,8 @@
+/**
+ * @file input_data.cpp
+ * @brief Implementation of the InputData class for a simple neural network.
+ */
+
 #include "input_data.hpp"
 
 InputData::InputData(const string filepath, const double divisor, const unsigned batchSize) :

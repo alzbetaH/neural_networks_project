@@ -11,6 +11,10 @@
 
 using namespace std;
 
+/**
+ * @class Net
+ * @brief Represents a whole net topology, providing methods for training neural network.
+ */
 class Net
 {
 private:

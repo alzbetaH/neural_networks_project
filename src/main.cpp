@@ -1,12 +1,11 @@
+/**
+ * @file main.cpp
+ * @brief Implementation of the main functions for training and testing the neural network.
+ */
+
 #include "main.hpp"
 
 vector<unsigned int> parseTopology(int number_of_layers, char* neurons_per_layer[]) {
-    /**
-     * @brief Parse strings in `neurons_per_layer` as the number of neurons in
-     * the network layers, describing the whole network topology.
-     * 
-     * Raises invalid_argument if unsuccessful
-     */
     vector<unsigned int> numbers;
 
     for (int i = 0; i < number_of_layers; ++i) {
@@ -22,16 +21,6 @@ vector<unsigned int> parseTopology(int number_of_layers, char* neurons_per_layer
     }
 
     return numbers;
-}
-
-void showVectorVals(string label, vector<double> &v)
-{
-    cout << label << " ";
-    for (unsigned i = 0; i < v.size(); i++)
-    {
-        cout << v[i] << " ";
-    }
-    cout << endl;
 }
 
 void usage(){
