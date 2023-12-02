@@ -12,7 +12,7 @@ network: $(SOURCES)
 	g++ -std=c++17 -Wall -O3 -Ofast $(SOURCES) -o network -g
 
 
-run: mnist
+run: network
 	./network -e 7 -b 32 -l 0.001 784 64 32 10
 
 
@@ -21,4 +21,4 @@ pack: clean
 
 
 clean:
-	rm -f network, train_predictions.csv test_predictions.csv xhrabos_xskalos.zip
+	rm -f network train_predictions.csv test_predictions.csv xhrabos_xskalos.zip
