@@ -30,5 +30,9 @@ run: mnist
 	@
 
 
+pack: clean
+	./pack.sh
+
+
 clean:
-	rm network
+	rm -f network, train_predictions.csv test_predictions.csv xhrabos_xskalos.zip
