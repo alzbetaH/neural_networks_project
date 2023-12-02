@@ -2,7 +2,7 @@
 
 
 # This should be enough:
-make -f Makefile run
+make -f Makefile mnist
 
 
 # Or, legacy code:

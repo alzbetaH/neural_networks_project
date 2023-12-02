@@ -231,15 +231,11 @@ int Net::compare_result(const vector<double> &output, const vector<double> &labe
     return (index_o == index_l);
 }
 
-void Net::setTraining(int is_training, unsigned int layer_num, double dropout)
+void Net::setDropout(unsigned int layer_num, double probability)
 {
     Layer &actLayer = m_layers[layer_num];
     for (unsigned i = 0; i < actLayer.size(); ++i)
     {
-        double random_value = rand() / static_cast<double>(RAND_MAX);
-        if (is_training && (random_value > (1 - dropout)))
-        {
-            actLayer[i].applyDropout();
-        }
+        actLayer[i].setDropout(probability);
     }
 }

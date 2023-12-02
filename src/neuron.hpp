@@ -33,12 +33,12 @@ private:
     vector<double> m_outWeightsGradients;
     unsigned m_myIndex; // Index of this neuron in the layer
     double m_gradient;
-    int apply_dropout;
+    int dropout_probability;
     int is_training;
 
 public:
     Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neuronIndex);
-    void applyDropout();
+    void setDropout(double probability);
     double getPotential() { return m_potential; }
     void setOutputVal(double val) { m_outVal = val; }
     double getOutputVal(void) const { return m_outVal; }

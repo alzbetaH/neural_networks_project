@@ -14,7 +14,7 @@ Neuron::Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neur
         m_outWeightsGradients.push_back(0.0);
     }
     m_myIndex = neuronIndex;
-    apply_dropout = 0;
+    dropout_probability = 0;
 }
 
 double Neuron::heWeightInit(unsigned numLayerInputs) {
@@ -27,9 +27,9 @@ double Neuron::heWeightInit(unsigned numLayerInputs) {
     return dis(gen);
 }
 
-void Neuron::applyDropout()
+void Neuron::setDropout(double probability)
 {
-    apply_dropout = 1;
+    dropout_probability = probability;
 }
 
 // void Neuron::updateWeights()
@@ -62,7 +62,6 @@ void Neuron::updateWeights()
 {
     for (unsigned i = 0; i < m_outWeights.size(); ++i)
     {
-        
         double gradient = m_outWeightsGradients[i];
 
         m_outWeightsDeltas[i] = decay * m_outWeightsDeltas[i] + (1 - decay) * gradient * gradient;
@@ -146,25 +145,28 @@ void Neuron::calcWeightGradients(const Layer &nextLayer)
 
 double Neuron::transferFunction(double x)
 {
-    // return tanh(x);
     // if (to_string(x) == "-nan")
     // {
     //     cout << "x = "<< x << endl;
     //     exit(0);
     // }
-    return max(0.0, x); // ReLU !Doesn't work
+    return max(0.0, x);
 }
 
 double Neuron::transferFunctionDerivative(double x)
 {
-    // return 1.0 - x * x; // approximate derivative of tanh
-
-    return x < 0.0f ? 0.0f : 1.0f; // ReLU !Doesn't work
+    return x < 0.0f ? 0.0f : 1.0f;
 }
 
 void Neuron::calcPotential(const Layer &prevLayer)
 {
     m_potential = 0.0;
+
+    // Apply dropout with probability
+    if((rand() / static_cast<float>(RAND_MAX)) < dropout_probability){
+        return;
+    }
+
     for (unsigned i = 0; i < prevLayer.size(); ++i)
     {
         m_potential += prevLayer[i].getOutputVal() * prevLayer[i].m_outWeights[m_myIndex];
@@ -183,7 +185,7 @@ void Neuron::calcPotential(const Layer &prevLayer)
 
 void Neuron::calcOutput()
 {
-    m_outVal = Neuron::apply_dropout ? 0.0 : Neuron::transferFunction(m_potential);
+    m_outVal = Neuron::transferFunction(m_potential);
 }
 
 void Neuron::setLearningRate(double learningRate)

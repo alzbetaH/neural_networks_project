@@ -147,8 +147,10 @@ int main(int argc, char *argv[]){
         unsigned seed = static_cast<unsigned>(time(nullptr));
         trainingInputs.shuffleData(seed);
         trainingLabels.shuffleData(seed);
-        //set dropout on first layer
-        myNet.setTraining(1, 1, 0.0);
+
+        // set dropout (hidden layers only)
+        myNet.setDropout(1, 0.5);
+        myNet.setDropout(2, 0.2);
         for(unsigned batch = 0; batch < ceil(trainingInputs.trainLength() / batchSize); ++batch)
         {
             // cout << "--------------------------------------------------" << endl;
@@ -185,8 +187,11 @@ int main(int argc, char *argv[]){
         // counting validation loss and accuracy
         double accuracy_sum_v = 0;
         double avg_loss_v = 0;
-        //unset dropout on first layer
-        myNet.setTraining(0, 1, 0.0);
+
+        // unset dropout
+        myNet.setDropout(1, 0.0);
+        myNet.setDropout(2, 0.0);
+
         for(unsigned j = 0; j < trainingInputs.validLength(); ++j)
         {
             input_v = trainingInputs.getNextValid();
