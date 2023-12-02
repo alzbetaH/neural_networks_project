@@ -140,7 +140,7 @@ int main(int argc, char *argv[]){
     InputData trainingInputs("./data/fashion_mnist_train_vectors.csv", 255.0, batchSize);
     LabelData trainingLabels("./data/fashion_mnist_train_labels.csv", 10, false);
     InputData testingInputs("./data/fashion_mnist_test_vectors.csv", 255.0, batchSize);
-    LabelData testingLabels("./data/fashion_mnist_test_labels.csv", 10, false); // TODO Before submitting: comment out
+    // LabelData testingLabels("./data/fashion_mnist_test_labels.csv", 10, false); // TODO Before submitting: comment out
 
     // split into training and validation data
     trainingInputs.splitData(0.8);
@@ -192,12 +192,11 @@ int main(int argc, char *argv[]){
             myNet.setDropout(layerNum, 0.0);
         }
 
-        // Counting loss and accuracy (first for train, then for validation set)
+        // Counting accuracy (first for train, then for validation set)
         double accuracy_sum = 0;
-        double avg_loss = 0;
 
         // Test the network on the TRAINING set to print loss and accuracy
-        // TODO Before submitting: comment out
+        double avg_loss = 0;
         for(unsigned j = 0; j < trainingInputs.trainLength(); ++j)
         {
             input_t = trainingInputs.getNextTrain();
@@ -240,7 +239,7 @@ int main(int argc, char *argv[]){
 
     // Test on the test subset and print the accuracy
     // TODO Before submitting: comment out
-    testAndPrintAccuracy(myNet, testingInputs, testingLabels, "Testing");
+    // testAndPrintAccuracy(myNet, testingInputs, testingLabels, "Testing");
 
     cout << "Done testing" << endl;
 }
