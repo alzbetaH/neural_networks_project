@@ -23,7 +23,7 @@ iris: network
 
 
 mnist: network
-	./network -e 35 -b 32 -l 0.001 784 64 16 10
+	./network -e 7 -b 32 -l 0.001 784 64 32 10
 
 
 run: mnist

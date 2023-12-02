@@ -132,9 +132,8 @@ int main(int argc, char *argv[]){
 
     Neuron::setLearningRate(learningRate);
 
-    // TODO Find a good seed and set it
-    unsigned seed = static_cast<unsigned>(time(nullptr));
-    // unsigned seed = 42;
+    // unsigned seed = static_cast<unsigned>(time(nullptr));
+    unsigned seed = 42;
 
     Net myNet(topology, seed);
 
@@ -228,7 +227,6 @@ int main(int argc, char *argv[]){
 
         // Test the network on the VALIDATION set to print loss and accuracy
         accuracy_sum = 0;
-        avg_loss = 0;
         for(unsigned j = 0; j < trainingInputs.validLength(); ++j)
         {
             input_v = trainingInputs.getNextValid();
@@ -239,9 +237,7 @@ int main(int argc, char *argv[]){
             {
                 accuracy_sum++;
             }
-            avg_loss += myNet.getLoss(label_v);
         }
-        cout << "Validation Loss: " << avg_loss / trainingInputs.validLength() << endl;
         cout << "Validation Accuracy: " << accuracy_sum / trainingInputs.validLength() << endl;
     }
     cout << "Done training" << endl;
@@ -255,7 +251,7 @@ int main(int argc, char *argv[]){
     testAndSavePredictions(myNet, testingInputs, "test_predictions.csv");
 
     // Test on the test subset and print the accuracy
-    // TODO Before submitting: comment out?
+    // TODO Before submitting: comment out
     testAndPrintAccuracy(myNet, testingInputs, testingLabels, "Testing");
 
     cout << "Done testing" << endl;
