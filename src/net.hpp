@@ -16,7 +16,7 @@ private:
     static double m_recentAverageSmoothingFactor;
 
 public:
-    Net(const vector<unsigned> &topology);
+    Net(const vector<unsigned> &topology, unsigned seed);
     void feedForward(const vector<double> &inputVals);
     void backProp(const vector<double> &targetVals);
     void updateWeights();

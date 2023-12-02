@@ -5,11 +5,13 @@ double Neuron::alpha = 0.9;
 double Neuron::decay = 0.9;
 double Neuron::epsilon = 1e-8;
 
-Neuron::Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neuronIndex)
+Neuron::Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neuronIndex, unsigned seed)
 {
+    std::mt19937 generator(seed); // To generate seeds individual to weights
+
     for (unsigned c = 0; c < numNeuronOutputs; ++c)
     {
-        m_outWeights.push_back(heWeightInit(numLayerInputs));
+        m_outWeights.push_back(heWeightInit(numLayerInputs, generator()));
         m_outWeightsDeltas.push_back(0.0);
         m_outWeightsGradients.push_back(0.0);
     }
@@ -17,14 +19,13 @@ Neuron::Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neur
     dropout_probability = 0;
 }
 
-double Neuron::heWeightInit(unsigned numLayerInputs) {
+double Neuron::heWeightInit(unsigned numLayerInputs, unsigned seed) {
     /**
      * @brief He weight initialization
      */
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::normal_distribution<> dis(0, std::sqrt(2.0 / numLayerInputs));
-    return dis(gen);
+    std::mt19937 generator(seed);
+    std::normal_distribution<> distribution(0, std::sqrt(2.0 / numLayerInputs));
+    return distribution(generator);
 }
 
 void Neuron::setDropout(double probability)

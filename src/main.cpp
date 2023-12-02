@@ -101,8 +101,10 @@ int main(int argc, char *argv[]){
 
     Neuron::setLearningRate(learningRate);
 
-    Net myNet(topology);
-    // TODO can we select the task using arguments, too? Or would that be too much?
+    // unsigned seed = static_cast<unsigned>(time(nullptr));
+    unsigned seed = 42;
+
+    Net myNet(topology, seed);
 
     // InputData trainingInputs("./data/xor_inputs.csv", 1.0, batchSize);
     // LabelData trainingLabels("./data/xor_labels.csv", 1, true);
@@ -144,7 +146,6 @@ int main(int argc, char *argv[]){
         cout << "Epoch " << epoch + 1 << endl;
 
         // Shuffle the training data
-        unsigned seed = static_cast<unsigned>(time(nullptr));
         trainingInputs.shuffleData(seed);
         trainingLabels.shuffleData(seed);
 

@@ -5,10 +5,11 @@
 
 double Net::m_recentAverageSmoothingFactor = 100.0;
 
-Net::Net(const vector<unsigned> &topology) : m_error(0.0), m_recentAverageError(0.0)
+Net::Net(const vector<unsigned> &topology, unsigned seed) : m_error(0.0), m_recentAverageError(0.0)
 {
-
     unsigned numLayers = topology.size();
+
+    std::mt19937 generator(seed); // To generate seeds individual to neurons
 
     for (unsigned layerNum = 0; layerNum < numLayers; ++layerNum) {
         m_layers.push_back(Layer());
@@ -18,7 +19,7 @@ Net::Net(const vector<unsigned> &topology) : m_error(0.0), m_recentAverageError(
 
         // creating neurons according to given topology (one additional for bias)
         for (unsigned neuronNum = 0; neuronNum <= topology[layerNum]; ++neuronNum) {
-            m_layers.back().push_back(Neuron(topology[layerNum], numOutputs, neuronNum));
+            m_layers.back().push_back(Neuron(topology[layerNum], numOutputs, neuronNum, generator()));
         }
 
         // bias value

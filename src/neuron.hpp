@@ -24,7 +24,7 @@ private:
     static double epsilon;
     static double transferFunction(double x);
     static double transferFunctionDerivative(double x);
-    static double heWeightInit(unsigned numLayerInputs);
+    static double heWeightInit(unsigned numLayerInputs, unsigned seed);
     double sumDOW(const Layer &nextLayer) const;
     double m_potential; // Inner neuron potential
     double m_outVal; // Output value of the neuron after activation function
@@ -37,7 +37,7 @@ private:
     int is_training;
 
 public:
-    Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neuronIndex);
+    Neuron(unsigned numLayerInputs, unsigned numNeuronOutputs, unsigned neuronIndex, unsigned seed);
     void setDropout(double probability);
     double getPotential() { return m_potential; }
     void setOutputVal(double val) { m_outVal = val; }
