@@ -49,3 +49,8 @@ entropy was chosen for the loss function. The network uses SGD with momentum
 and RMSProp. Dropout is implemented but turned off as it doesn't seem
 necessary.
 
+
+# Sources
+
+Code architecture inspired by
+[https://www.youtube.com/watch?v=sK9AbJ4P8ao](https://www.youtube.com/watch?v=sK9AbJ4P8ao)
